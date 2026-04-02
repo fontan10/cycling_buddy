@@ -1,0 +1,207 @@
+.location-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* ── Search bar ─────────────────────────────────────────────── */
+.location-picker__search-wrap {
+  position: relative;
+}
+
+.location-picker__search {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-card);
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-ambient);
+  outline: none;
+  transition: box-shadow 150ms ease;
+  -webkit-appearance: none;
+}
+
+.location-picker__search::placeholder {
+  color: var(--text-muted);
+}
+
+.location-picker__search:focus {
+  box-shadow: 0 0 0 3px rgba(56, 182, 255, 0.25), var(--shadow-ambient);
+}
+
+/* Hide the browser's built-in search cancel (×) button */
+.location-picker__search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+/* ── Results dropdown ───────────────────────────────────────── */
+/* No 1px lines — items are separated by background color shifts */
+.location-picker__results {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  left: 0;
+  right: 0;
+  background: var(--surface-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  list-style: none;
+  overflow: hidden;
+  z-index: 1000;
+  padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.location-picker__result-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+  /* No border — background shift separates items */
+  transition: background 120ms ease;
+}
+
+@media (hover: hover) {
+  .location-picker__result-btn:hover {
+    background: var(--surface-cell);
+  }
+}
+
+.location-picker__result-btn:active {
+  background: var(--surface-cell);
+}
+
+/* ── Map container ──────────────────────────────────────────── */
+.location-picker__map {
+  height: 260px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  /* Layered shadow — float on top of the form */
+  box-shadow: var(--shadow-float);
+  cursor: crosshair;
+  z-index: 0;
+}
+
+/* Desaturate OpenStreetMap tiles so they sit harmoniously with
+   the soft lavender palette instead of fighting it */
+.location-picker__map .leaflet-layer,
+.location-picker__map .leaflet-tile-pane {
+  filter: saturate(0.65) brightness(1.04);
+}
+
+/* ── Leaflet attribution control ────────────────────────────── */
+/* Override Leaflet's default chrome to match the design system */
+.location-picker__map .leaflet-control-attribution {
+  font-family: var(--font-body) !important;
+  font-size: 0.625rem !important;
+  color: var(--text-muted) !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius-sm) 0 0 0;
+  padding: 2px 6px !important;
+  box-shadow: none !important;
+}
+
+.location-picker__map .leaflet-control-attribution a {
+  color: var(--color-primary) !important;
+  text-decoration: none;
+}
+
+/* ── Custom pin marker ──────────────────────────────────────── */
+/* Teardrop shape — the sharp corner is rotated to point downward */
+.map-pin {
+  width: 22px;
+  height: 22px;
+  background: var(--color-primary);
+  border: 3px solid white;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow:
+    0 3px 0 rgba(44, 62, 107, 0.20),   /* press shadow */
+    0 4px 16px rgba(56, 182, 255, 0.55); /* primary glow */
+}
+
+/* ── Status card ────────────────────────────────────────────── */
+.location-picker__status {
+  background: var(--surface-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-ambient);
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+/* Loading state */
+.status-row--loading {
+  color: var(--text-muted);
+}
+
+.status-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--surface-cell);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-circle);
+  flex-shrink: 0;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Hint state */
+.status-row--hint {
+  color: var(--text-muted);
+  font-style: italic;
+  gap: var(--space-sm);
+}
+
+/* Resolved address */
+.status-pin {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.status-address {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0; /* allow text to truncate */
+}
+
+.status-address__primary {
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-address__secondary {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

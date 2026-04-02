@@ -1,0 +1,103 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface-card);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 24px rgba(44, 62, 107, 0.10);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 0 var(--space-lg) var(--space-md);
+  z-index: 100;
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: var(--space-md);
+  flex: 1;
+  color: var(--text-muted);
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.bottom-nav__item--active {
+  color: var(--text-primary);
+}
+
+.bottom-nav__icon {
+  width: 26px;
+  height: 26px;
+}
+
+.bottom-nav__label {
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Report center button ───────────────────────────────────── */
+.bottom-nav__item--report {
+  transform: translateY(-20px);
+  color: var(--color-primary);
+  gap: 6px;
+}
+
+.bottom-nav__report-bubble {
+  width: 76px;
+  height: 76px;
+  border-radius: var(--radius-circle);
+  background: rgba(56, 182, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease;
+}
+
+.bottom-nav__report-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-circle);
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-primary);
+  box-shadow: 0 4px 12px rgba(56, 182, 255, 0.40);
+  transition: transform 130ms ease, box-shadow 130ms ease;
+}
+
+.bottom-nav__label--report {
+  color: var(--color-primary);
+}
+
+@media (hover: hover) {
+  .bottom-nav__item--report:hover .bottom-nav__report-bubble {
+    background: rgba(56, 182, 255, 0.22);
+  }
+
+  .bottom-nav__item--report:hover .bottom-nav__report-icon {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(56, 182, 255, 0.45);
+  }
+}
+
+.bottom-nav__item--report:active .bottom-nav__report-icon {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.bottom-nav__item:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}

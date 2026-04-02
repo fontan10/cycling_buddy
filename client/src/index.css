@@ -1,0 +1,69 @@
+:root {
+  /* Brand Colors */
+  --color-primary:   #38B6FF;
+  --color-secondary: #FFD600;
+  --color-tertiary:  #7ED957;
+  --color-neutral:   #5C799B;
+  --color-danger:    #E74C3C;
+  --color-navy:      #2C3E6B;
+
+  /* Surfaces */
+  --surface-app:              #E8EAFF;
+  --surface-card:             #FFFFFF;
+  --surface-cell:             #D8DCFA;
+  --surface-sidebar:          #F4F6FF;
+
+  /* Text */
+  --text-primary:    #2C3E6B;
+  --text-muted:      #8A9BBF;
+  --text-on-primary: #FFFFFF;
+
+  /* Radius */
+  --radius-sm:     8px;
+  --radius-md:     16px;
+  --radius-pill:   999px;
+  --radius-circle: 50%;
+
+  /* Spacing (8pt scale) */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  40px;
+
+  /* Elevation — tinted, never pure black */
+  --shadow-ambient: 0 4px 20px rgba(44, 62, 107, 0.08);
+  --shadow-float:   0 12px 40px rgba(44, 62, 107, 0.14);
+  --shadow-press:   0 4px 0px  rgba(44, 62, 107, 0.18);
+
+  /* Typography */
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body:    'Be Vietnam Pro', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--surface-app);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
