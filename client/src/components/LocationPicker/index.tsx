@@ -78,13 +78,13 @@ function FlyTo({ coords }: { coords: Coords | null }) {
 
 // ── Main component ─────────────────────────────────────────────
 export function LocationPicker({ onChange }: LocationPickerProps) {
-  const [pin, setPin]           = useState<Coords | null>(null)
+  const [pin, setPin] = useState<Coords | null>(null)
   const [flyTarget, setFlyTarget] = useState<Coords | null>(null)
-  const [address, setAddress]   = useState<DisplayAddress | null>(null)
+  const [address, setAddress] = useState<DisplayAddress | null>(null)
   const [resolving, setResolving] = useState(false)
-  const [query, setQuery]       = useState('')
-  const [results, setResults]   = useState<NominatimResult[]>([])
-  const searchTimer = useRef<ReturnType<typeof setTimeout>>()
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<NominatimResult[]>([])
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Centre on device GPS when the map first loads
   useEffect(() => {
@@ -96,7 +96,7 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
   const reverseGeocode = async (coords: Coords) => {
     setResolving(true)
     try {
-      const res  = await fetch(
+      const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat=${coords.lat}&lon=${coords.lng}`,
         { headers: { 'Accept-Language': 'en' } },
       )
@@ -120,11 +120,13 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
 
   const handleQueryChange = (value: string) => {
     setQuery(value)
-    clearTimeout(searchTimer.current)
+    if (searchTimer.current !== null) {
+      clearTimeout(searchTimer.current);
+    }
     if (value.length < 3) { setResults([]); return }
     searchTimer.current = setTimeout(async () => {
       try {
-        const res  = await fetch(
+        const res = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}&limit=5`,
           { headers: { 'Accept-Language': 'en' } },
         )

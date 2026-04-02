@@ -49,18 +49,6 @@ export function ReportPage() {
           </div>
 
           <div className="form-field">
-            <label className="form-field__label" htmlFor="description">
-              What's wrong?
-            </label>
-            <textarea
-              id="description"
-              className="form-field__input form-field__input--textarea"
-              placeholder="Tell us more about the problem…"
-              rows={4}
-            />
-          </div>
-
-          <div className="form-field">
             <span className="form-field__label">Add a photo</span>
             <label className="photo-upload" htmlFor="photo">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -71,6 +59,18 @@ export function ReportPage() {
               <span>Tap to add photo</span>
               <input id="photo" type="file" accept="image/*" capture="environment" className="photo-upload__input" />
             </label>
+          </div>
+
+          <div className="form-field">
+            <label className="form-field__label" htmlFor="description">
+              What's wrong?
+            </label>
+            <textarea
+              id="description"
+              className="form-field__input form-field__input--textarea"
+              placeholder="Tell us more about the problem…"
+              rows={4}
+            />
           </div>
 
           <button type="submit" className="submit-btn">
