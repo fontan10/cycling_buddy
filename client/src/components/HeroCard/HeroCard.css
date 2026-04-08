@@ -39,10 +39,10 @@
   position: absolute;
   right: -10px;
   bottom: -12px;
-  font-size: 128px;
+  font-size: 144px;
   line-height: 1;
-  opacity: 0.18;
+  opacity: 0.58;
   pointer-events: none;
   user-select: none;
-  transform: rotate(12deg);
+  transform: rotate(8deg);
 }

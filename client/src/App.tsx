@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { LandingPage } from './pages/LandingPage'
 import { ReportPage } from './pages/ReportPage'
+import { SuccessPage } from './pages/SuccessPage'
 import { PageTransition } from './components/PageTransition'
 
 function AnimatedRoutes() {
@@ -13,6 +14,7 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.key}>
         <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
         <Route path="/report/:categoryId" element={<PageTransition><ReportPage /></PageTransition>} />
+        <Route path="/success" element={<PageTransition><SuccessPage /></PageTransition>} />
       </Routes>
     </AnimatePresence>
   )

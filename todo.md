@@ -1,7 +1,0 @@
-- Make the app multi-lingual
-- first goal should be Finnish
-- other languages would be very useful
-- emphasize the mobile-first approach to the website and ask if any changes need to be made
-- ask about how to deploy onto server
-- create thank you/congratulations page
-- change to MapBox?

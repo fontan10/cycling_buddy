@@ -12,7 +12,7 @@
   align-items: flex-end;
   justify-content: space-around;
   padding: 0 var(--space-lg) var(--space-md);
-  z-index: 100;
+  z-index: 1000;
 }
 
 .bottom-nav__item {

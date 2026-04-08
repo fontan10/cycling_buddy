@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-lea
 import L from 'leaflet'
 import type { LatLng } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { DEFAULT_CENTER } from '../../data/map'
 import './LocationPicker.css'
 
 // ── Custom pin icon (avoids Leaflet's broken default in Vite) ──
@@ -13,9 +14,6 @@ const PIN_ICON = L.divIcon({
   // Anchor at bottom-centre so the teardrop tip sits on the coordinate
   iconAnchor: [11, 22],
 })
-
-// ── Default map centre (Espoo Metro Areena, Urheilupuistontie 3) ─
-const DEFAULT_CENTER: [number, number] = [60.1766, 24.8133]
 
 // ── Types ──────────────────────────────────────────────────────
 interface Coords { lat: number; lng: number }

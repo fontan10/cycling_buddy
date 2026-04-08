@@ -4,6 +4,7 @@ import { Navbar } from '../../components/Navbar'
 import { HeroCard } from '../../components/HeroCard'
 import { CategoryCard } from '../../components/CategoryCard'
 import { BottomNav } from '../../components/BottomNav'
+import { MapPage } from '../MapPage'
 import { CATEGORIES } from '../../data/categories'
 import type { Tab } from '../../types'
 import './LandingPage.css'
@@ -11,6 +12,16 @@ import './LandingPage.css'
 export function LandingPage() {
   const [activeTab, setActiveTab] = useState<Tab>('report')
   const navigate = useNavigate()
+
+  if (activeTab === 'map') {
+    return (
+      <div className="page page--map">
+        <Navbar />
+        <MapPage />
+        <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
+    )
+  }
 
   return (
     <div className="page">

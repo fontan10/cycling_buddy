@@ -1,0 +1,185 @@
+/* ── Map page wrapper ─────────────────────────────────────────── */
+.map-page {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+}
+
+/* ── Leaflet map container ────────────────────────────────────── */
+.map-page__map {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  isolation: isolate;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-float);
+}
+
+/* Desaturate tiles to match the lavender palette */
+.map-page__map .leaflet-layer,
+.map-page__map .leaflet-tile-pane {
+  filter: saturate(0.65) brightness(1.04);
+}
+
+.map-page__map .leaflet-control-attribution {
+  font-family: var(--font-body) !important;
+  font-size: 0.625rem !important;
+  color: var(--text-muted) !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius-sm) 0 0 0;
+  padding: 2px 6px !important;
+  box-shadow: none !important;
+}
+
+.map-page__map .leaflet-control-attribution a {
+  color: var(--color-primary) !important;
+  text-decoration: none;
+}
+
+/* ── Report marker pin ────────────────────────────────────────── */
+.report-marker {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow:
+    0 3px 0 rgba(44, 62, 107, 0.20),
+    0 4px 14px rgba(0, 0, 0, 0.22);
+}
+
+/* ── Popup ────────────────────────────────────────────────────── */
+.report-popup .leaflet-popup-content-wrapper {
+  background: var(--surface-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  padding: 0;
+  overflow: hidden;
+}
+
+.report-popup .leaflet-popup-tip-container {
+  display: none;
+}
+
+.report-popup .leaflet-popup-content {
+  margin: 0;
+  min-width: 180px;
+  max-width: 240px;
+}
+
+.report-popup__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+}
+
+.report-popup__emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.report-popup__category {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.report-popup__address {
+  padding: 0 var(--space-md) var(--space-sm);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.report-popup__desc {
+  padding: 0 var(--space-md) var(--space-sm);
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.report-popup__photo {
+  display: block;
+  width: 100%;
+  max-height: 140px;
+  object-fit: cover;
+}
+
+.report-popup__date {
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  background: var(--surface-cell);
+}
+
+/* ── Overlays (loading / error / empty) ───────────────────────── */
+.map-page__overlay {
+  position: absolute;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-card);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-float);
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  white-space: nowrap;
+  z-index: 500;
+  pointer-events: none;
+}
+
+.map-page__overlay--loading {
+  color: var(--text-muted);
+}
+
+.map-page__overlay--error {
+  color: var(--color-danger);
+}
+
+.map-page__overlay--empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.map-page__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--surface-cell);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-circle);
+  flex-shrink: 0;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Report count badge ───────────────────────────────────────── */
+.map-page__badge {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  background: var(--surface-card);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-float);
+  padding: var(--space-xs) var(--space-md);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  z-index: 500;
+  pointer-events: none;
+}

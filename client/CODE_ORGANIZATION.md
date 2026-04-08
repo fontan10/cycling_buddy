@@ -7,12 +7,24 @@ client/
 ├── public/              Static assets served at the root URL
 ├── src/
 │   ├── assets/          Images and SVGs imported by components
-│   ├── components/      Reusable UI components
-│   ├── data/            Static app data (categories, constants)
-│   ├── pages/           Full-screen page compositions
-│   ├── types/           Shared TypeScript interfaces and union types
+│   ├── components/
+│   │   ├── BottomNav/   Bottom navigation bar
+│   │   ├── CategoryCard/ Tappable card for each report category
+│   │   ├── HeroCard/    Hero banner shown on the landing page
+│   │   ├── LocationPicker/ Address search + map pin input
+│   │   ├── Navbar/      Top navigation bar
+│   │   └── PageTransition/ Wraps route elements with slide animations
+│   ├── data/
+│   │   └── categories.ts  Static list of report categories
+│   ├── pages/
+│   │   ├── LandingPage/ Home screen — map + category picker
+│   │   ├── ReportPage/  Form for submitting a new hazard report
+│   │   └── SuccessPage/ Confirmation screen shown after a report is saved
+│   ├── types/
+│   │   └── index.ts     Shared interfaces: Category, Tab
 │   ├── index.css        Global design tokens and CSS reset
-│   ├── App.tsx          Root component — renders the active page
+│   ├── App.css          App-level styles
+│   ├── App.tsx          Root component — BrowserRouter + AnimatedRoutes
 │   └── main.tsx         Vite entry point — mounts the app into the DOM
 └── index.html           HTML shell — loads fonts and the module bundle
 ```
