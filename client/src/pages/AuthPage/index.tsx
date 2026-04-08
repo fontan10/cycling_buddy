@@ -54,7 +54,7 @@ export function AuthPage() {
         <div className="auth-page__header">
           <div className="auth-page__title-row">
             <h1 className="auth-page__title">Join the Ride!</h1>
-            <span className="auth-page__badge">FREE</span>
+            <span className="auth-page__badge">Woohoo</span>
           </div>
           <p className="auth-page__subtitle">
             Help keep cyclists safe by reporting hazards on your routes
