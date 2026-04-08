@@ -3,6 +3,10 @@ import { AnimatePresence } from 'framer-motion'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import MarkerClusterGroup from 'react-leaflet-markercluster'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import 'react-leaflet-markercluster/styles'
 import { CATEGORIES } from '../../data/categories'
 import { DEFAULT_CENTER } from '../../data/map'
 import { ReportSheet } from './ReportSheet'
@@ -72,21 +76,34 @@ export function MapPage() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
 
-        {reports.map((report) => {
-          const cat = CATEGORIES.find((c) => c.id === report.categoryId)
-          if (!cat || !report.coords) return null
-          const isActive = selected?._id === report._id
-          return (
-            <Marker
-              key={report._id}
-              position={[report.coords.lat, report.coords.lng]}
-              icon={makeMarkerIcon(cat.color, isActive)}
-              eventHandlers={{
-                click: () => setSelected(isActive ? null : report),
-              }}
-            />
-          )
-        })}
+        <MarkerClusterGroup
+          iconCreateFunction={(cluster: { getChildCount: () => number }) =>
+            L.divIcon({
+              className: '',
+              html: `<div class="cluster-marker">${cluster.getChildCount()}</div>`,
+              iconSize: [44, 44],
+              iconAnchor: [22, 22],
+            })
+          }
+          showCoverageOnHover={false}
+          maxClusterRadius={60}
+        >
+          {reports.map((report) => {
+            const cat = CATEGORIES.find((c) => c.id === report.categoryId)
+            if (!cat || !report.coords) return null
+            const isActive = selected?._id === report._id
+            return (
+              <Marker
+                key={report._id}
+                position={[report.coords.lat, report.coords.lng]}
+                icon={makeMarkerIcon(cat.color, isActive)}
+                eventHandlers={{
+                  click: () => setSelected(isActive ? null : report),
+                }}
+              />
+            )
+          })}
+        </MarkerClusterGroup>
       </MapContainer>
 
       {loading && (
