@@ -3,7 +3,7 @@ import { Schema, model, Types } from 'mongoose';
 const reportCommentLikeSchema = new Schema(
   {
     commentId: { type: Types.ObjectId, ref: 'ReportComment', required: true },
-    userId:    { type: String, required: true },
+    userId:    { type: Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true },
 );

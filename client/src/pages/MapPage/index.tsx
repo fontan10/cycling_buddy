@@ -116,10 +116,6 @@ export function MapPage() {
         </div>
       )}
 
-      <div className="map-page__badge">
-        {loading ? '…' : reports.length} report{reports.length !== 1 ? 's' : ''}
-      </div>
-
       <AnimatePresence>
         {selected && selectedCat && (
           <ReportSheet

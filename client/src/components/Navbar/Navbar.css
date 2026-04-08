@@ -25,6 +25,12 @@
   letter-spacing: -0.01em;
 }
 
+/* ── Profile button ── */
+
+.navbar__profile-wrap {
+  position: relative;
+}
+
 .navbar__profile {
   width: 36px;
   height: 36px;
@@ -48,4 +54,62 @@
 .navbar__profile:focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+.navbar__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-circle);
+  object-fit: cover;
+}
+
+/* ── Dropdown menu ── */
+
+.navbar__menu {
+  position: absolute;
+  top: calc(100% + var(--space-sm));
+  right: 0;
+  min-width: 148px;
+  background: var(--surface-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  padding: var(--space-xs);
+  list-style: none;
+  transform-origin: top right;
+  z-index: 100;
+}
+
+.navbar__menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: background 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .navbar__menu-item:hover {
+    background: var(--surface-cell);
+  }
+}
+
+.navbar__menu-item:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.navbar__menu-item--success {
+  color: #22c55e;
+  cursor: default;
+}
+
+.navbar__menu-item-icon {
+  display: flex;
+  align-items: center;
 }

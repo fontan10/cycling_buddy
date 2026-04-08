@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Navbar } from '../../components/Navbar'
 import { HeroCard } from '../../components/HeroCard'
 import { CategoryCard } from '../../components/CategoryCard'
@@ -10,7 +10,8 @@ import type { Tab } from '../../types'
 import './LandingPage.css'
 
 export function LandingPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('report')
+  const location = useLocation()
+  const [activeTab, setActiveTab] = useState<Tab>(location.state?.tab ?? 'report')
   const navigate = useNavigate()
 
   if (activeTab === 'map') {

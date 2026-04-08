@@ -1,7 +1,8 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { Report } from '../models/Report';
 import { ReportComment } from '../models/ReportComment';
 import { ReportCommentLike } from '../models/ReportCommentLike';
+import { requireAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
@@ -19,10 +20,14 @@ router.get('/reports/:reportId/comments', async (req, res) => {
 });
 
 // Add a comment to a report
-router.post('/reports/:reportId/comments', async (req, res) => {
+router.post('/reports/:reportId/comments', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { userId, text } = req.body;
-    const comment = await ReportComment.create({ reportId: req.params.reportId, userId, text });
+    const { text } = req.body;
+    const comment = await ReportComment.create({
+      reportId: req.params.reportId,
+      userId:   req.userId,
+      text,
+    });
     const commentCount = await ReportComment.countDocuments({
       reportId: req.params.reportId,
       isDeleted: false,
@@ -55,10 +60,9 @@ router.delete('/comments/:id', async (req, res) => {
 });
 
 // Like a comment
-router.post('/comments/:id/likes', async (req, res) => {
+router.post('/comments/:id/likes', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.body;
-    await ReportCommentLike.create({ commentId: req.params.id, userId });
+    await ReportCommentLike.create({ commentId: req.params.id, userId: req.userId });
     const likeCount = await ReportCommentLike.countDocuments({ commentId: req.params.id });
     res.status(201).json({ likeCount });
   } catch (err: any) {
@@ -68,10 +72,9 @@ router.post('/comments/:id/likes', async (req, res) => {
 });
 
 // Unlike a comment
-router.delete('/comments/:id/likes', async (req, res) => {
+router.delete('/comments/:id/likes', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.body;
-    const like = await ReportCommentLike.findOneAndDelete({ commentId: req.params.id, userId });
+    const like = await ReportCommentLike.findOneAndDelete({ commentId: req.params.id, userId: req.userId });
     if (!like) return res.status(404).json({ error: 'Like not found' });
     const likeCount = await ReportCommentLike.countDocuments({ commentId: req.params.id });
     res.json({ likeCount });

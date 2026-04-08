@@ -1,8 +1,11 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
+import { AuthProvider } from './context/AuthContext'
 import { LandingPage } from './pages/LandingPage'
 import { ReportPage } from './pages/ReportPage'
 import { SuccessPage } from './pages/SuccessPage'
+import { AuthCallbackPage } from './pages/AuthCallbackPage'
+import { AuthPage } from './pages/AuthPage'
 import { PageTransition } from './components/PageTransition'
 
 function AnimatedRoutes() {
@@ -15,6 +18,8 @@ function AnimatedRoutes() {
         <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
         <Route path="/report/:categoryId" element={<PageTransition><ReportPage /></PageTransition>} />
         <Route path="/success" element={<PageTransition><SuccessPage /></PageTransition>} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/auth" element={<AuthPage />} />
       </Routes>
     </AnimatePresence>
   )
@@ -23,7 +28,9 @@ function AnimatedRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AnimatedRoutes />
+      <AuthProvider>
+        <AnimatedRoutes />
+      </AuthProvider>
     </BrowserRouter>
   )
 }

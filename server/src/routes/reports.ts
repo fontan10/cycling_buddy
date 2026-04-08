@@ -1,6 +1,7 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { Report } from '../models/Report';
 import { ReportLike } from '../models/ReportLike';
+import { requireAuth, optionalAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
@@ -25,11 +26,18 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create a report
-router.post('/', async (req, res) => {
+// Create a report (anonymous or authenticated)
+router.post('/', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
     const { categoryId, address, coords, description, photoUrl } = req.body;
-    const report = await Report.create({ categoryId, address, coords, description, photoUrl });
+    const report = await Report.create({
+      categoryId,
+      address,
+      coords,
+      description,
+      photoUrl,
+      userId: req.userId ?? null,
+    });
     res.status(201).json(report);
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
@@ -52,10 +60,9 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Like a report
-router.post('/:id/likes', async (req, res) => {
+router.post('/:id/likes', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.body;
-    await ReportLike.create({ reportId: req.params.id, userId });
+    await ReportLike.create({ reportId: req.params.id, userId: req.userId });
     const likeCount = await ReportLike.countDocuments({ reportId: req.params.id });
     await Report.findByIdAndUpdate(req.params.id, { likeCount });
     res.status(201).json({ likeCount });
@@ -66,10 +73,9 @@ router.post('/:id/likes', async (req, res) => {
 });
 
 // Unlike a report
-router.delete('/:id/likes', async (req, res) => {
+router.delete('/:id/likes', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.body;
-    const like = await ReportLike.findOneAndDelete({ reportId: req.params.id, userId });
+    const like = await ReportLike.findOneAndDelete({ reportId: req.params.id, userId: req.userId });
     if (!like) return res.status(404).json({ error: 'Like not found' });
     const likeCount = await ReportLike.countDocuments({ reportId: req.params.id });
     await Report.findByIdAndUpdate(req.params.id, { likeCount });

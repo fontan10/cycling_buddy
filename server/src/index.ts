@@ -2,8 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import passport from 'passport';
 import reportRoutes from './routes/reports';
 import commentRoutes from './routes/comments';
+import authRoutes from './routes/auth';
 
 dotenv.config();
 
@@ -13,11 +15,14 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/cycling_bu
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // required for Apple's form POST callback
+app.use(passport.initialize());
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api', commentRoutes);
 

@@ -1,7 +1,8 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Types } from 'mongoose';
 
 const reportSchema = new Schema(
   {
+    userId:       { type: Types.ObjectId, ref: 'User', default: null },
     categoryId:   { type: String, required: true },
     address:      { type: String, required: true },
     coords: {
