@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CATEGORIES } from '../../data/categories'
 import { LocationPicker } from '../../components/LocationPicker'
+import { clearReportsCache } from '../MapPage'
 import './ReportPage.css'
 
 interface Coords { lat: number; lng: number }
@@ -58,6 +59,7 @@ export function ReportPage() {
       })
 
       if (!res.ok) throw new Error('Failed to save report')
+      clearReportsCache()
       navigate('/success', { state: { categoryId } })
     } catch {
       setErrors({ submit: 'Something went wrong. Please try again.' })

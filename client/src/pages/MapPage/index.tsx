@@ -21,6 +21,10 @@ interface Report {
 
 let cachedReports: Report[] | null = null
 
+export function clearReportsCache() {
+  cachedReports = null
+}
+
 function makeMarkerIcon(color: string, active = false) {
   return L.divIcon({
     className: '',
