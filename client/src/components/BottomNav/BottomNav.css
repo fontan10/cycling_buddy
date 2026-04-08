@@ -35,6 +35,11 @@
 .bottom-nav__icon {
   width: 26px;
   height: 26px;
+  transition: transform 130ms ease;
+}
+
+.bottom-nav__item:not(.bottom-nav__item--report):active .bottom-nav__icon {
+  transform: translateY(2px);
 }
 
 .bottom-nav__label {
@@ -48,45 +53,65 @@
 /* ── Report center button ───────────────────────────────────── */
 .bottom-nav__item--report {
   transform: translateY(-20px);
-  color: var(--color-primary);
   gap: 6px;
+}
+
+.bottom-nav__item--report-active {
+  color: var(--color-primary);
 }
 
 .bottom-nav__report-bubble {
   width: 76px;
   height: 76px;
   border-radius: var(--radius-circle);
-  background: rgba(56, 182, 255, 0.15);
+  background: var(--surface-cell);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 150ms ease;
 }
 
+.bottom-nav__item--report-active .bottom-nav__report-bubble {
+  background: rgba(56, 182, 255, 0.15);
+}
+
 .bottom-nav__report-icon {
   width: 52px;
   height: 52px;
   border-radius: var(--radius-circle);
-  background: var(--color-primary);
+  background: var(--color-neutral);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-on-primary);
-  box-shadow: 0 4px 12px rgba(56, 182, 255, 0.40);
-  transition: transform 130ms ease, box-shadow 130ms ease;
+  box-shadow: 0 4px 12px rgba(44, 62, 107, 0.20);
+  transition: transform 130ms ease, box-shadow 130ms ease, background 150ms ease;
 }
 
-.bottom-nav__label--report {
-  color: var(--color-primary);
+.bottom-nav__item--report-active .bottom-nav__report-icon {
+  background: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(56, 182, 255, 0.40);
 }
 
 @media (hover: hover) {
+  .bottom-nav__item:not(.bottom-nav__item--report):hover .bottom-nav__icon {
+    transform: translateY(-3px);
+  }
+
   .bottom-nav__item--report:hover .bottom-nav__report-bubble {
+    background: var(--surface-cell);
+  }
+
+  .bottom-nav__item--report-active:hover .bottom-nav__report-bubble {
     background: rgba(56, 182, 255, 0.22);
   }
 
   .bottom-nav__item--report:hover .bottom-nav__report-icon {
     transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(44, 62, 107, 0.25);
+  }
+
+  .bottom-nav__item--report-active:hover .bottom-nav__report-icon {
     box-shadow: 0 8px 20px rgba(56, 182, 255, 0.45);
   }
 }
