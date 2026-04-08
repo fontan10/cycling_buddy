@@ -7,20 +7,11 @@ import MarkerClusterGroup from 'react-leaflet-markercluster'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import 'react-leaflet-markercluster/styles'
+import type { Report } from '../../types'
 import { CATEGORIES } from '../../data/categories'
 import { DEFAULT_CENTER } from '../../data/map'
 import { ReportSheet } from './ReportSheet'
 import './MapPage.css'
-
-interface Report {
-  _id: string
-  categoryId: string
-  address: string
-  coords: { lat: number; lng: number }
-  description: string
-  photoUrl: string
-  createdAt: string
-}
 
 
 let cachedReports: Report[] | null = null

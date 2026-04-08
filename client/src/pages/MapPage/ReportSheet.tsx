@@ -1,13 +1,5 @@
 import { motion } from 'framer-motion'
-import type { Category } from '../../types'
-
-interface Report {
-  _id: string
-  address: string
-  description: string
-  photoUrl: string
-  createdAt: string
-}
+import type { Report, Category } from '../../types'
 
 interface Props {
   report: Report
@@ -60,13 +52,19 @@ export function ReportSheet({ report, category, onClose }: Props) {
         />
       )}
 
-      <p className="report-sheet__date">
-        {new Date(report.createdAt).toLocaleDateString(undefined, {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        })}
-      </p>
+      <div className="report-sheet__footer">
+        <p className="report-sheet__date">
+          {new Date(report.createdAt).toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          })}
+        </p>
+        <div className="report-sheet__stats">
+          <span>👍 {report.likeCount}</span>
+          <span>💬 {report.commentCount}</span>
+        </div>
+      </div>
     </motion.div>
   )
 }
