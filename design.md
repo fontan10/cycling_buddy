@@ -46,8 +46,20 @@ Treat the UI as a series of stacked, organic shapes. Never use surfaces intercha
 - **Glass & Gradient Rule:** For floating headers or navigation bars, use a semi-transparent `surface` with a 20px backdrop blur.
 - **Signature Textures:** Apply a subtle linear gradient (from `primary` to a lighter primary tint) on large action areas to provide a "convex" physical feel.
 
+### Tint Palette (Icon Backgrounds)
+
+Small icon circles use softened tints of brand colors as their fill. These are not full-opacity brand colors — they are pastel variants that keep the UI readable at small sizes.
+
+| Role | Background | Icon Color | Use |
+| --- | --- | --- | --- |
+| Blue tint | `#E0F4FF` | `#38B6FF` | Location, navigation, info actions |
+| Yellow tint | `#FFF8D6` | `#E6B800` | GPS, highlights, attention |
+| Green tint | `#EDFCE0` | `#4DB82A` | Success, confirmations, description |
+
 ### The "No-Line" Rule
 **Prohibit 1px solid borders for sectioning.** Define boundaries with background color shifts, not lines. A main activity area in `surface-cell` should sit directly on `surface-card`—this creates a softer transition that feels "carved" rather than "drawn."
+
+**Exception — Focus Borders:** Interactive form inputs may carry a `2px transparent border` that becomes `--color-primary` on `:focus`. This is purely a functional affordance (keyboard/accessibility navigation), not a decorative divider, and is therefore exempt from this rule.
 
 ---
 
@@ -154,14 +166,58 @@ For kid-friendly category selection, use large Bubbles instead of radio buttons.
 - Tap state: background shifts to `tertiary` tint; press animates `translateY(2px)`
 
 ### Input Fields
+
 Avoid the "form" look. Inputs are full-width pill-shaped (`border-radius: 999px`) with:
-- Background: `--surface-cell` (`#D8DCFA`) or light neutral `#EEF1F8`
-- Subtle left-aligned icon in neutral tone
+
+- Background: `--surface-card` (`#FFFFFF`)
+- `2px transparent border` that transitions to `--color-primary` on focus, paired with a `4px` primary glow ring (`rgba(56, 182, 255, 0.15)`)
 - Placeholder text in `--text-muted` (`#8A9BBF`)
 - Labels always placed **outside** the container, never floating inside
+- Textareas use `--radius-md` (16px) instead of pill, with `resize: none`
+
+### Section Label Icons
+
+Form section labels pair a small **28px icon circle** with the label text to add color and communicate context at a glance. The circle uses a pastel tint background (see Tint Palette) with a matching brand-colored emoji or SVG icon inside.
+
+```text
+[icon circle] Label text
+```
+
+- Circle size: 28×28px, `border-radius: 50%`
+- Icon size: 14px emoji or SVG
+- Color assignment: yellow tint for location, blue tint for description/chat, green tint for success/confirmation
+- Labels use `font-weight: 700` and `--text-primary` (elevated from previous `--text-muted` 600 weight)
+
+### Progress Stepper
+
+Multi-step flows use a horizontal row of pill-shaped dots below the header to communicate progress.
+
+| State | Width | Color |
+| --- | --- | --- |
+| Done | 24px | `--color-tertiary` (`#7ED957`) |
+| Active | 36px (wider) | `--color-primary` (`#38B6FF`) |
+| Upcoming | 24px | `--surface-cell` (`#D8DCFA`) |
+
+- Height: 6px, `border-radius: 999px`
+- Gap between dots: 6px
+- Width and color transition with `300ms ease`
+- Marked `aria-hidden="true"` — not a substitute for accessible step labels
+
+### Photo Upload
+
+The photo upload zone is a visually distinct dashed-border card:
+
+- Background: `#F0FAFF` (light blue tint)
+- Border: `2px dashed --color-primary`
+- Hover: background deepens to `#E0F4FF`, border darkens to `#1A9FEF`
+- Camera icon sits inside a **64px filled blue circle** (`--color-primary` background, white icon, `box-shadow: 0 6px 20px rgba(56, 182, 255, 0.40)`)
+- Title text: `Plus Jakarta Sans`, 700 weight, `--text-primary`
+- Subtitle text: 0.8125rem, `--text-muted`, centered
 
 ### Navigation Bar
+
 Horizontal icon bar with three slots: Home, Search, Profile.
+
 - Active state: filled circle behind the icon in `#2C3E6B` (deep navy)
 - Inactive: neutral tone, no fill
 - Icons: outlined style, 24px, 2px stroke weight

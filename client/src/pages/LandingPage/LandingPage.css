@@ -13,8 +13,19 @@
 .page--map {
   height: 100svh;
   min-height: unset;
-  padding-bottom: 80px; /* keeps content above the fixed nav */
+  padding-bottom: 0;
   overflow: hidden;
+}
+
+/* Pull the nav back into the flex flow so the map ends exactly where nav starts */
+.page--map .bottom-nav {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  width: 100%;
+  max-width: none;
+  flex-shrink: 0;
 }
 
 .page__main {

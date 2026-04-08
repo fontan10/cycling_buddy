@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { AnimatePresence } from 'framer-motion'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { CATEGORIES } from '../../data/categories'
 import { DEFAULT_CENTER } from '../../data/map'
+import { ReportSheet } from './ReportSheet'
 import './MapPage.css'
 
 interface Report {
@@ -17,31 +19,41 @@ interface Report {
 }
 
 
-function makeMarkerIcon(color: string) {
+let cachedReports: Report[] | null = null
+
+function makeMarkerIcon(color: string, active = false) {
   return L.divIcon({
     className: '',
-    html: `<div class="report-marker" style="background:${color}"></div>`,
+    html: `<div class="report-marker${active ? ' report-marker--active' : ''}" style="background:${color}"></div>`,
     iconSize: [24, 24],
     iconAnchor: [12, 24],
-    popupAnchor: [0, -26],
   })
 }
 
 export function MapPage() {
-  const [reports, setReports] = useState<Report[]>([])
-  const [loading, setLoading] = useState(true)
+  const [reports, setReports] = useState<Report[]>(cachedReports ?? [])
+  const [loading, setLoading] = useState(cachedReports === null)
   const [error, setError] = useState(false)
+  const [selected, setSelected] = useState<Report | null>(null)
 
   useEffect(() => {
+    if (cachedReports !== null) return
     fetch('/api/reports')
       .then((r) => {
         if (!r.ok) throw new Error()
         return r.json()
       })
-      .then((data) => setReports(data))
+      .then((data) => {
+        cachedReports = data
+        setReports(data)
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [])
+
+  const selectedCat = selected
+    ? CATEGORIES.find((c) => c.id === selected.categoryId)
+    : null
 
   return (
     <div className="map-page">
@@ -59,41 +71,16 @@ export function MapPage() {
         {reports.map((report) => {
           const cat = CATEGORIES.find((c) => c.id === report.categoryId)
           if (!cat || !report.coords) return null
+          const isActive = selected?._id === report._id
           return (
             <Marker
               key={report._id}
               position={[report.coords.lat, report.coords.lng]}
-              icon={makeMarkerIcon(cat.color)}
-            >
-              <Popup className="report-popup">
-                <div className="report-popup__header">
-                  <span className="report-popup__emoji" aria-hidden="true">{cat.emoji}</span>
-                  <span className="report-popup__category">{cat.label}</span>
-                </div>
-                {report.address && (
-                  <p className="report-popup__address">
-                    {report.address.split(',').slice(0, 2).join(',')}
-                  </p>
-                )}
-                {report.description && (
-                  <p className="report-popup__desc">{report.description}</p>
-                )}
-                {report.photoUrl && (
-                  <img
-                    className="report-popup__photo"
-                    src={report.photoUrl}
-                    alt="Report photo"
-                  />
-                )}
-                <p className="report-popup__date">
-                  {new Date(report.createdAt).toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </p>
-              </Popup>
-            </Marker>
+              icon={makeMarkerIcon(cat.color, isActive)}
+              eventHandlers={{
+                click: () => setSelected(isActive ? null : report),
+              }}
+            />
           )
         })}
       </MapContainer>
@@ -120,6 +107,17 @@ export function MapPage() {
       <div className="map-page__badge">
         {loading ? '…' : reports.length} report{reports.length !== 1 ? 's' : ''}
       </div>
+
+      <AnimatePresence>
+        {selected && selectedCat && (
+          <ReportSheet
+            key={selected._id}
+            report={selected}
+            category={selectedCat}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
