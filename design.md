@@ -17,6 +17,22 @@ By leveraging high-contrast typography scales and overlapping surface containers
 
 ---
 
+### Mobile-First Design Philosophy
+
+**Core premise:** Families and children use this app in the field — at the park, on the path, when they arrive at their destination and spot something wrong. The window between noticing a problem and wanting to report it is short. Every design decision must make that action as fast and effortless as possible, especially for young users and caregivers with their hands full.
+
+**Design implications:**
+
+- **Thumb-first layouts.** Primary actions (report, confirm, submit) sit in the lower portion of the screen within natural thumb reach. Navigation and back controls remain predictable so a child can use them confidently without help.
+- **One-handed operation.** Touch targets are large enough to hit without precision, freeing a caregiver's other hand for a child, stroller, or bike handle.
+- **Minimal required input.** Default to the device's GPS for location. Reduce required fields to the bare minimum — a report with a location and a category is far more valuable than an abandoned one. Every optional field must feel genuinely optional.
+- **No dead-end flows.** Tapping back mid-report preserves the draft. Nothing is lost. Children and caregivers will be interrupted; the app should recover gracefully.
+- **Fast, clear feedback.** Tap states and success confirmations are immediate and unmistakable — young users need to know right away that something worked.
+
+These principles directly inform the component and layout choices in every section below.
+
+---
+
 ## 2. Colors
 
 Our palette communicates positivity and trust. Each color has a defined semantic role; never swap them arbitrarily.
@@ -57,7 +73,9 @@ Small icon circles use softened tints of brand colors as their fill. These are n
 | Green tint | `#EDFCE0` | `#4DB82A` | Success, confirmations, description |
 
 ### The "No-Line" Rule
-**Prohibit 1px solid borders for sectioning.** Define boundaries with background color shifts, not lines. A main activity area in `surface-cell` should sit directly on `surface-card`—this creates a softer transition that feels "carved" rather than "drawn."
+**Prohibit decorative borders of any width.** This includes `border-left` accent strips, button outlines, and card dividers — regardless of whether they are 1px or 4px. Define all boundaries with background color shifts, not lines. A main activity area in `surface-cell` should sit directly on `surface-card`—this creates a softer transition that feels "carved" rather than "drawn."
+
+**Button affordance without borders:** When a secondary button must be visually distinct from its background, use a tonal background step (`var(--surface-cell)` on a `var(--surface-card)` parent, or `var(--surface-card)` on a `var(--surface-app)` parent) rather than adding a border. The background shift alone is sufficient to define the button shape.
 
 **Exception — Focus Borders:** Interactive form inputs may carry a `2px transparent border` that becomes `--color-primary` on `:focus`. This is purely a functional affordance (keyboard/accessibility navigation), not a decorative divider, and is therefore exempt from this rule.
 
@@ -93,7 +111,7 @@ Both typefaces share rounded terminal characteristics that reinforce the playful
 - **Base unit:** 8px — all spacing values are multiples of 8
 - Cards and panels: `16–24px` internal padding
 - Grid gaps: `12–16px` between cells
-- Max content width on mobile: `480px`, centered
+- Max content width on mobile: `480px`, centered — the layout is designed for mobile viewports first; wider screens are a secondary concern
 
 ### Spacing Scale
 
@@ -124,6 +142,7 @@ Depth is achieved through **Tonal Layering** and **Soft Physics**, never through
 
 - **The Layering Principle:** Stack `surface-cell` over `surface-card` to create natural prominence. This "paper-on-paper" look is more intuitive for children than complex 3D lighting.
 - **Ambient Shadows:** When an element must "float" (modal, FAB), use a diffused, tinted shadow: `rgba(14, 48, 78, 0.08)` with a 40px blur. Never use pure black shadows.
+- **Shadow Tint Standard:** The base color for all shadows is `rgba(44, 62, 107, ...)` — the deep navy of `--text-primary`. Never use `rgba(0, 0, 0, ...)` in any shadow value, including on map markers, cluster bubbles, or overlay panels. Opacity varies by context (0.08 ambient → 0.45 dramatic) but the RGB values never change.
 - **The Ghost Border:** If a boundary is strictly required for accessibility, use `--neutral` at 15% opacity. Never use pure black or high-contrast grays.
 - **Glassmorphism:** Use `surface-card` at 60% opacity with a heavy backdrop blur for overlay panels, letting background colors "glow" through.
 - **Press Shadow:** Simulate physical depth on buttons with a 4px bottom shadow in a darker shade of the button's fill color.
@@ -134,7 +153,7 @@ Depth is achieved through **Tonal Layering** and **Soft Physics**, never through
 
 ### Buttons
 
-All buttons are pill-shaped (`border-radius: 999px`) and use Label type size. Minimum touch target: 44×44px.
+All buttons are pill-shaped (`border-radius: 999px`) and use Label type size. Minimum touch target: 44×44px. This floor exists explicitly to support mobile-first, one-handed use — a target smaller than 44px forces precision that slows children and on-the-go caregivers down.
 
 | Variant | Background | Text | Use |
 | --- | --- | --- | --- |
@@ -144,6 +163,39 @@ All buttons are pill-shaped (`border-radius: 999px`) and use Label type size. Mi
 | **Outlined** | Transparent | Dark | Low-emphasis actions |
 
 All primary buttons carry a 4px "press-shadow" in a darker primary shade to simulate a physical button.
+
+#### Required mobile properties
+
+Every interactive element (`button`, `a`, `label[for]`) must include:
+
+```css
+-webkit-tap-highlight-color: transparent; /* removes the grey flash on tap */
+touch-action: manipulation;               /* eliminates the 300ms tap delay */
+```
+
+These are non-negotiable for mobile-first use. A missing `touch-action` makes the app feel sluggish to children and caregivers tapping quickly.
+
+#### Small / contextual buttons
+
+Close buttons, like buttons, "View details →" links, and comment actions are visually small but must still meet the 44×44px touch target. Achieve this without changing the visual size:
+
+```css
+display: inline-flex;
+align-items: center;
+min-height: 44px;
+padding: 0 var(--space-xs); /* horizontal breathing room */
+```
+
+The element looks small visually but the hit area is full-height. Never use `padding: 0` or fixed pixel heights below 44px on tappable elements.
+
+#### Destructive confirmation pattern
+
+When confirming a destructive action (e.g. delete), present two pill buttons side by side — no border outlines, background fill only:
+
+- **Confirm:** `background: rgba(224, 85, 85, 0.12); color: #e05555`
+- **Cancel:** `background: var(--surface-cell); color: var(--text-muted)`
+
+Both still require `min-height: 44px`.
 
 #### Icon Buttons (Circular FAB-style)
 ~44px diameter. Semantic color coding:
@@ -159,7 +211,7 @@ All primary buttons carry a 4px "press-shadow" in a darker primary shade to simu
 **Forbid divider lines.** Separate list items with `--space-md` (16px) of vertical white space. Use `surface-cell` for the card body and `surface-container-lowest` for inner data sections to create recessed depth.
 
 ### Interactive "Bubbles" (Custom Component)
-For kid-friendly category selection, use large Bubbles instead of radio buttons. These are `surface-container-lowest` rounded tiles that transition to a primary-tinted state when tapped, providing instant, encouraging feedback.
+For kid-friendly category selection, use large Bubbles instead of radio buttons. These are `surface-container-lowest` rounded tiles that transition to a primary-tinted state when tapped, providing instant, encouraging feedback. Bubbles replace radio buttons specifically because radio buttons are too small and precision-dependent for children or for use while moving — a large tap surface with obvious selected/unselected states reduces category selection to a single deliberate tap.
 - Minimum size: 120px tall, full column width
 - Emoji icon: 48px, slightly offset for playful asymmetry
 - Label: `Be Vietnam Pro`, 600 weight
@@ -190,7 +242,7 @@ Form section labels pair a small **28px icon circle** with the label text to add
 
 ### Progress Stepper
 
-Multi-step flows use a horizontal row of pill-shaped dots below the header to communicate progress.
+Multi-step flows use a horizontal row of pill-shaped dots below the header to communicate progress. Breaking reporting into steps — rather than presenting one long form — keeps each screen scannable and low-cognitive-load, which is critical when the user is outdoors and distracted.
 
 | State | Width | Color |
 | --- | --- | --- |
@@ -205,7 +257,7 @@ Multi-step flows use a horizontal row of pill-shaped dots below the header to co
 
 ### Photo Upload
 
-The photo upload zone is a visually distinct dashed-border card:
+The photo upload zone is a visually distinct dashed-border card. Photos are treated as optional and prominent rather than buried, because a quick camera snap is often the fastest way for a child to communicate a problem — faster than typing. The large tap area supports glove-wearing and small hands alike.
 
 - Background: `#F0FAFF` (light blue tint)
 - Border: `2px dashed --color-primary`
@@ -301,6 +353,8 @@ Pill-shaped inline labels (`border-radius: 999px`):
 ## 10. Do's and Don'ts
 
 ### Do:
+
+- **Design mobile first:** Every new screen or component must work on a 390px wide viewport held in one hand before it is considered for larger sizes. If it requires two hands or precision tapping to use, it needs to be redesigned.
 - **Use Asymmetry:** Offset illustrative icons by `--space-xs` to create a hand-placed, playful feel.
 - **Over-scale Icons:** Category/bubble icons must be at least 48px to accommodate developing motor skills.
 - **Layer with Purpose:** Use the surface tiers (`surface-card` → `surface-cell` → `surface-container-lowest`) to guide the user from background to action.

@@ -50,7 +50,7 @@
   transform: rotate(-45deg);
   box-shadow:
     0 3px 0 rgba(44, 62, 107, 0.20),
-    0 4px 14px rgba(0, 0, 0, 0.22);
+    0 4px 14px rgba(44, 62, 107, 0.22);
 }
 
 /* ── Popup ────────────────────────────────────────────────────── */
@@ -172,7 +172,7 @@
   border-color: #fff;
   box-shadow:
     0 0 0 3px #1a2340,
-    0 4px 14px rgba(0,0,0,0.45);
+    0 4px 14px rgba(44, 62, 107, 0.45);
   transform: rotate(-45deg) scale(1.2);
 }
 
@@ -198,14 +198,19 @@
   position: absolute;
   top: var(--space-sm);
   right: var(--space-sm);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 0.875rem;
   color: var(--text-muted);
-  line-height: 1;
-  padding: 4px 6px;
   border-radius: var(--radius-sm);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .report-sheet__close:hover {
@@ -266,6 +271,7 @@
 
 .report-sheet__stats {
   display: flex;
+  align-items: center;
   gap: var(--space-sm);
   font-size: 0.6875rem;
   color: var(--text-muted);
@@ -275,12 +281,15 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  min-height: 44px;
+  padding: 0 var(--space-xs);
   background: none;
   border: none;
-  padding: 0;
   font-size: inherit;
   color: var(--text-muted);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .report-sheet__like-btn:disabled {
@@ -293,11 +302,16 @@
 }
 
 .report-sheet__open-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-xs);
   font-family: var(--font-display);
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-primary);
-  padding: 2px 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .report-sheet__open-btn:hover {
@@ -309,7 +323,7 @@
   width: 44px;
   height: 44px;
   background: rgba(255, 255, 255, 0.92);
-  border: 2px solid rgba(0, 0, 0, 0.12);
+  border: 2px solid rgba(44, 62, 107, 0.12);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -318,7 +332,7 @@
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 8px rgba(44, 62, 107, 0.18);
   cursor: pointer;
 }
 

@@ -16,8 +16,8 @@
 }
 
 .report-header__back {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-circle);
   background: var(--surface-card);
   display: flex;
@@ -27,6 +27,7 @@
   flex-shrink: 0;
   transition: background 150ms ease, color 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   box-shadow: var(--shadow-ambient);
 }
 
@@ -85,7 +86,6 @@
   margin: 0 var(--space-lg) var(--space-md);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-ambient);
-  border-left: 4px solid var(--color-primary);
 }
 
 .report-category-banner__icon {
@@ -215,6 +215,7 @@
   cursor: pointer;
   transition: background 150ms ease, border-color 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 @media (hover: hover) {
@@ -269,6 +270,7 @@
   box-shadow: 0 6px 20px rgba(56, 182, 255, 0.40);
   transition: transform 120ms ease, box-shadow 120ms ease;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   margin-top: var(--space-sm);
 }
 

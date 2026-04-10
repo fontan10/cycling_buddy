@@ -26,22 +26,11 @@
   position: relative;
 }
 
-/* Category color accent strip */
-.report-detail__header::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: var(--space-sm);
-  bottom: var(--space-sm);
-  width: 4px;
-  border-radius: var(--radius-pill);
-  background: var(--category-color, var(--color-primary));
-}
 
 .report-detail__back {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,6 +41,8 @@
   flex-shrink: 0;
   line-height: 1;
   transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .report-detail__back:hover {
@@ -144,26 +135,27 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs);
+  min-height: 44px;
   padding: 6px var(--space-md);
   border-radius: var(--radius-pill);
-  border: 2px solid var(--surface-cell);
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--text-muted);
-  background: var(--surface-card);
-  transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
+  background: var(--surface-cell);
+  transition: color 0.15s, background 0.15s, box-shadow 0.15s;
   box-shadow: var(--shadow-press);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .report-detail__like-btn:not(:disabled):hover {
-  border-color: var(--color-primary);
+  background: rgba(56, 182, 255, 0.08);
   color: var(--color-primary);
 }
 
 .report-detail__like-btn--active {
-  border-color: var(--color-primary);
   color: var(--color-primary);
-  background: rgba(56, 182, 255, 0.08);
+  background: rgba(56, 182, 255, 0.15);
 }
 
 .report-detail__like-btn:disabled {
@@ -256,6 +248,7 @@
 
 .report-detail__submit {
   align-self: flex-end;
+  min-height: 44px;
   padding: 8px var(--space-lg);
   background: var(--color-primary);
   color: var(--text-on-primary);
@@ -266,6 +259,8 @@
   flex-shrink: 0;
   box-shadow: 0 4px 0 rgba(14, 48, 78, 0.20);
   transition: opacity 0.15s, box-shadow 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .report-detail__submit:not(:disabled):active {
@@ -328,24 +323,28 @@
 }
 
 .report-detail__comment-like {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 3px 10px;
   border-radius: var(--radius-pill);
-  border: 1.5px solid var(--surface-cell);
+  font-size: 0.75rem;
   font-weight: 600;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  color: var(--text-muted);
+  background: var(--surface-cell);
+  transition: color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .report-detail__comment-like:not(:disabled):hover {
   color: var(--color-primary);
-  border-color: var(--color-primary);
+  background: rgba(56, 182, 255, 0.08);
 }
 
 .report-detail__comment-like--active {
   color: var(--color-primary);
-  border-color: var(--color-primary);
-  background: rgba(56, 182, 255, 0.08);
+  background: rgba(56, 182, 255, 0.12);
 }
 
 .report-detail__comment-like:disabled {
@@ -359,18 +358,21 @@
 }
 
 .report-detail__comment-delete {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 3px 10px;
   border-radius: var(--radius-pill);
-  border: 1.5px solid transparent;
+  font-size: 0.75rem;
   font-weight: 600;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  color: var(--text-muted);
+  transition: color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .report-detail__comment-delete:hover {
   color: #e05555;
-  border-color: #e05555;
   background: rgba(224, 85, 85, 0.08);
 }
 
@@ -388,30 +390,34 @@
 
 .report-detail__confirm-yes,
 .report-detail__confirm-no {
-  font-size: 0.75rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 3px 8px;
   border-radius: var(--radius-pill);
-  border: 1.5px solid;
+  font-size: 0.75rem;
+  font-weight: 700;
   transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .report-detail__confirm-yes {
   color: #e05555;
-  border-color: #e05555;
+  background: rgba(224, 85, 85, 0.12);
 }
 
 .report-detail__confirm-yes:hover {
-  background: rgba(224, 85, 85, 0.12);
+  background: rgba(224, 85, 85, 0.20);
 }
 
 .report-detail__confirm-no {
   color: var(--text-muted);
-  border-color: var(--surface-cell);
+  background: var(--surface-cell);
 }
 
 .report-detail__confirm-no:hover {
-  background: var(--surface-cell);
+  background: var(--surface-card);
 }
 
 .report-detail__empty {
