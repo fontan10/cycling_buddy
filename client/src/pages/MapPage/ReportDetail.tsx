@@ -1,50 +1,26 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { apiFetch } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
+import { ReportComments } from './ReportComments'
 import type { Category, Report } from '../../types'
 import './ReportDetail.css'
-
-interface Comment {
-  _id: string
-  text: string
-  createdAt: string
-}
 
 interface Props {
   report: Report
   category: Category
   onClose: () => void
   onLikeChange?: (reportId: string, likeCount: number) => void
+  onCommentCountChange?: (reportId: string, commentCount: number) => void
 }
 
-export function ReportDetail({ report, category, onClose, onLikeChange }: Props) {
+export function ReportDetail({ report, category, onClose, onLikeChange, onCommentCountChange }: Props) {
   const { user } = useAuth()
-
-  const [comments, setComments] = useState<Comment[]>([])
-  const [commentsLoading, setCommentsLoading] = useState(true)
 
   const [likeCount, setLikeCount] = useState(report.likeCount)
   const [hasLiked, setHasLiked] = useState(false)
   const [liking, setLiking] = useState(false)
-
-  const [commentLikes, setCommentLikes] = useState<Record<string, { count: number; liked: boolean }>>({})
-
-  const [commentText, setCommentText] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  useEffect(() => {
-    apiFetch<Comment[]>(`/reports/${report._id}/comments`)
-      .then((data) => {
-        setComments(data)
-        const init: Record<string, { count: number; liked: boolean }> = {}
-        data.forEach((c) => { init[c._id] = { count: 0, liked: false } })
-        setCommentLikes(init)
-      })
-      .catch(() => {})
-      .finally(() => setCommentsLoading(false))
-  }, [report._id])
+  const [commentCount, setCommentCount] = useState(report.commentCount)
 
   useEffect(() => {
     if (!user) return
@@ -74,37 +50,6 @@ export function ReportDetail({ report, category, onClose, onLikeChange }: Props)
       }
     } finally {
       setLiking(false)
-    }
-  }
-
-  async function toggleCommentLike(commentId: string) {
-    if (!user) return
-    const current = commentLikes[commentId] ?? { count: 0, liked: false }
-    try {
-      if (!current.liked) {
-        const res = await apiFetch<{ likeCount: number }>(`/comments/${commentId}/likes`, { method: 'POST' })
-        setCommentLikes((prev) => ({ ...prev, [commentId]: { count: res.likeCount, liked: true } }))
-      } else {
-        const res = await apiFetch<{ likeCount: number }>(`/comments/${commentId}/likes`, { method: 'DELETE' })
-        setCommentLikes((prev) => ({ ...prev, [commentId]: { count: res.likeCount, liked: false } }))
-      }
-    } catch {}
-  }
-
-  async function submitComment() {
-    if (!user || !commentText.trim() || submitting) return
-    setSubmitting(true)
-    try {
-      const comment = await apiFetch<Comment>(`/reports/${report._id}/comments`, {
-        method: 'POST',
-        body: JSON.stringify({ text: commentText.trim() }),
-      })
-      setComments((prev) => [comment, ...prev])
-      setCommentLikes((prev) => ({ ...prev, [comment._id]: { count: 0, liked: false } }))
-      setCommentText('')
-    } catch {
-    } finally {
-      setSubmitting(false)
     }
   }
 
@@ -147,90 +92,40 @@ export function ReportDetail({ report, category, onClose, onLikeChange }: Props)
           <p className="report-detail__desc">{report.description}</p>
         )}
 
-        <p className="report-detail__date">
-          {new Date(report.createdAt).toLocaleDateString(undefined, {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-          })}
-        </p>
-
-        {/* ── Like button ── */}
-        <div className="report-detail__actions">
-          <button
-            className={`report-detail__like-btn${hasLiked ? ' report-detail__like-btn--active' : ''}`}
-            onClick={toggleReportLike}
-            disabled={!user || liking}
-            title={!user ? 'Log in to like' : undefined}
-          >
-            <span>👍</span>
-            <span>{likeCount}</span>
-          </button>
-          <span className="report-detail__comment-stat">
-            <span>💬</span>
-            <span>{comments.length}</span>
+        {/* ── Date + stats row ── */}
+        <div className="report-detail__meta">
+          <span className="report-detail__date">
+            {new Date(report.createdAt).toLocaleDateString(undefined, {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
           </span>
+          <div className="report-detail__actions">
+            <button
+              className={`report-detail__like-btn${hasLiked ? ' report-detail__like-btn--active' : ''}`}
+              onClick={toggleReportLike}
+              disabled={!user || liking}
+              title={!user ? 'Log in to like' : undefined}
+            >
+              <span>👍</span>
+              <span>{likeCount}</span>
+            </button>
+            <span className="report-detail__comment-stat">
+              <span>💬</span>
+              <span>{commentCount}</span>
+            </span>
+          </div>
         </div>
 
         {/* ── Comments ── */}
-        <section className="report-detail__comments">
-          <h3 className="report-detail__comments-title">Comments</h3>
-
-          {user ? (
-            <div className="report-detail__add-comment">
-              <textarea
-                ref={textareaRef}
-                className="report-detail__input"
-                placeholder="Add a comment…"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                rows={2}
-              />
-              <button
-                className="report-detail__submit"
-                onClick={submitComment}
-                disabled={!commentText.trim() || submitting}
-              >
-                {submitting ? '…' : 'Post'}
-              </button>
-            </div>
-          ) : (
-            <p className="report-detail__login-hint">Log in to comment or like.</p>
-          )}
-
-          {commentsLoading ? (
-            <p className="report-detail__empty">Loading…</p>
-          ) : comments.length === 0 ? (
-            <p className="report-detail__empty">No comments yet — be the first!</p>
-          ) : (
-            <ul className="report-detail__comment-list">
-              {comments.map((c) => {
-                const cl = commentLikes[c._id] ?? { count: 0, liked: false }
-                return (
-                  <li key={c._id} className="report-detail__comment">
-                    <p className="report-detail__comment-text">{c.text}</p>
-                    <div className="report-detail__comment-footer">
-                      <span className="report-detail__comment-date">
-                        {new Date(c.createdAt).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </span>
-                      <button
-                        className={`report-detail__comment-like${cl.liked ? ' report-detail__comment-like--active' : ''}`}
-                        onClick={() => toggleCommentLike(c._id)}
-                        disabled={!user}
-                        title={!user ? 'Log in to like' : undefined}
-                      >
-                        👍 {cl.count}
-                      </button>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-        </section>
+        <ReportComments
+          reportId={report._id}
+          onCountChange={(count) => {
+            setCommentCount(count)
+            onCommentCountChange?.(report._id, count)
+          }}
+        />
       </div>
     </motion.div>
   )

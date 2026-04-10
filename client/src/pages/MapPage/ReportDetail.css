@@ -99,7 +99,7 @@
   padding: var(--space-md);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   background: var(--surface-card);
 }
 
@@ -120,21 +120,24 @@
   padding: var(--space-md);
 }
 
+/* ── Date + stats row ────────────────────────────────────────────── */
+.report-detail__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
 .report-detail__date {
   font-size: 0.75rem;
   color: var(--text-muted);
-  padding: 0 var(--space-xs);
-  margin-top: calc(var(--space-xs) * -1);
 }
 
-/* ── Like / stats row ────────────────────────────────────────────── */
 .report-detail__actions {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  background: var(--surface-container-lowest);
-  border-radius: var(--radius-md);
-  padding: var(--space-sm) var(--space-md);
 }
 
 .report-detail__like-btn {
@@ -276,6 +279,19 @@
   box-shadow: none;
 }
 
+.report-detail__submit-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+.report-detail__posted {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
 /* ── Comment list ────────────────────────────────────────────────── */
 .report-detail__comment-list {
   list-style: none;
@@ -334,6 +350,68 @@
 
 .report-detail__comment-like:disabled {
   cursor: default;
+}
+
+.report-detail__comment-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.report-detail__comment-delete {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid transparent;
+  font-weight: 600;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.report-detail__comment-delete:hover {
+  color: #e05555;
+  border-color: #e05555;
+  background: rgba(224, 85, 85, 0.08);
+}
+
+.report-detail__confirm-delete {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.report-detail__confirm-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #e05555;
+}
+
+.report-detail__confirm-yes,
+.report-detail__confirm-no {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid;
+  transition: background 0.15s;
+}
+
+.report-detail__confirm-yes {
+  color: #e05555;
+  border-color: #e05555;
+}
+
+.report-detail__confirm-yes:hover {
+  background: rgba(224, 85, 85, 0.12);
+}
+
+.report-detail__confirm-no {
+  color: var(--text-muted);
+  border-color: var(--surface-cell);
+}
+
+.report-detail__confirm-no:hover {
+  background: var(--surface-cell);
 }
 
 .report-detail__empty {

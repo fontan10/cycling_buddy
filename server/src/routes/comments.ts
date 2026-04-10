@@ -39,21 +39,21 @@ router.post('/reports/:reportId/comments', requireAuth, async (req: AuthRequest,
   }
 });
 
-// Soft delete a comment
-router.delete('/comments/:id', async (req, res) => {
+// Soft delete a comment (owner only)
+router.delete('/comments/:id', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const comment = await ReportComment.findOneAndUpdate(
-      { _id: req.params.id, isDeleted: false },
-      { isDeleted: true, deletedAt: new Date() },
-      { new: true },
-    );
+    const comment = await ReportComment.findOne({ _id: req.params.id, isDeleted: false });
     if (!comment) return res.status(404).json({ error: 'Comment not found' });
+    if (comment.userId.toString() !== req.userId) return res.status(403).json({ error: 'Forbidden' });
+    comment.isDeleted = true;
+    comment.deletedAt = new Date();
+    await comment.save();
     const commentCount = await ReportComment.countDocuments({
       reportId: comment.reportId,
       isDeleted: false,
     });
     await Report.findByIdAndUpdate(comment.reportId, { commentCount });
-    res.json(comment);
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }

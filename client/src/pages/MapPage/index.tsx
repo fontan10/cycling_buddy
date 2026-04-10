@@ -174,6 +174,11 @@ export function MapPage() {
               setSelected((prev) => prev?._id === id ? { ...prev, likeCount } : prev)
               if (cachedReports) cachedReports = cachedReports.map((r) => r._id === id ? { ...r, likeCount } : r)
             }}
+            onCommentCountChange={(id, commentCount) => {
+              setReports((prev) => prev.map((r) => r._id === id ? { ...r, commentCount } : r))
+              setSelected((prev) => prev?._id === id ? { ...prev, commentCount } : prev)
+              if (cachedReports) cachedReports = cachedReports.map((r) => r._id === id ? { ...r, commentCount } : r)
+            }}
           />
         )}
       </AnimatePresence>
