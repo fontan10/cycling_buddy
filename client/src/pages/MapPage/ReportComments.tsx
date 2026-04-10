@@ -8,6 +8,8 @@ interface Comment {
   userId: string
   text: string
   createdAt: string
+  likeCount: number
+  liked: boolean
 }
 
 interface Props {
@@ -34,7 +36,7 @@ export function ReportComments({ reportId, onCountChange }: Props) {
       .then((data) => {
         setComments(data)
         const init: Record<string, { count: number; liked: boolean }> = {}
-        data.forEach((c) => { init[c._id] = { count: 0, liked: false } })
+        data.forEach((c) => { init[c._id] = { count: c.likeCount, liked: c.liked } })
         setCommentLikes(init)
         onCountChange?.(data.length)
       })
@@ -47,8 +49,14 @@ export function ReportComments({ reportId, onCountChange }: Props) {
     const current = commentLikes[commentId] ?? { count: 0, liked: false }
     try {
       if (!current.liked) {
-        const res = await apiFetch<{ likeCount: number }>(`/comments/${commentId}/likes`, { method: 'POST' })
-        setCommentLikes((prev) => ({ ...prev, [commentId]: { count: res.likeCount, liked: true } }))
+        try {
+          const res = await apiFetch<{ likeCount: number }>(`/comments/${commentId}/likes`, { method: 'POST' })
+          setCommentLikes((prev) => ({ ...prev, [commentId]: { count: res.likeCount, liked: true } }))
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === 'Already liked') {
+            setCommentLikes((prev) => ({ ...prev, [commentId]: { ...prev[commentId], liked: true } }))
+          }
+        }
       } else {
         const res = await apiFetch<{ likeCount: number }>(`/comments/${commentId}/likes`, { method: 'DELETE' })
         setCommentLikes((prev) => ({ ...prev, [commentId]: { count: res.likeCount, liked: false } }))

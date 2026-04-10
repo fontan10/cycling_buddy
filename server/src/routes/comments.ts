@@ -2,18 +2,43 @@ import { Router, Response } from 'express';
 import { Report } from '../models/Report';
 import { ReportComment } from '../models/ReportComment';
 import { ReportCommentLike } from '../models/ReportCommentLike';
-import { requireAuth, AuthRequest } from '../middleware/auth';
+import { requireAuth, optionalAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
-// List comments for a report (non-deleted)
-router.get('/reports/:reportId/comments', async (req, res) => {
+// List comments for a report (non-deleted), with like counts and current-user liked status
+router.get('/reports/:reportId/comments', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
     const comments = await ReportComment.find({
       reportId: req.params.reportId,
       isDeleted: false,
     }).sort({ createdAt: -1 });
-    res.json(comments);
+
+    const commentIds = comments.map((c) => c._id);
+
+    const likeCounts = await ReportCommentLike.aggregate([
+      { $match: { commentId: { $in: commentIds } } },
+      { $group: { _id: '$commentId', count: { $sum: 1 } } },
+    ]);
+    const likeCountMap: Record<string, number> = {};
+    likeCounts.forEach((l) => { likeCountMap[l._id.toString()] = l.count; });
+
+    const userLikedSet = new Set<string>();
+    if (req.userId) {
+      const userLikes = await ReportCommentLike.find({
+        commentId: { $in: commentIds },
+        userId: req.userId,
+      });
+      userLikes.forEach((l) => userLikedSet.add(l.commentId.toString()));
+    }
+
+    const result = comments.map((c) => ({
+      ...c.toObject(),
+      likeCount: likeCountMap[c._id.toString()] ?? 0,
+      liked: userLikedSet.has(c._id.toString()),
+    }));
+
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }
