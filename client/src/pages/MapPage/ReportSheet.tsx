@@ -1,15 +1,49 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { apiFetch } from '../../lib/api'
+import { useAuth } from '../../context/AuthContext'
 import type { Report, Category } from '../../types'
 
 interface Props {
   report: Report
   category: Category
   onClose: () => void
+  onOpen: () => void
+  onLikeChange?: (reportId: string, likeCount: number) => void
 }
 
 const spring = { type: 'spring', stiffness: 380, damping: 28 } as const
 
-export function ReportSheet({ report, category, onClose }: Props) {
+export function ReportSheet({ report, category, onClose, onOpen, onLikeChange }: Props) {
+  const { user } = useAuth()
+
+  const [likeCount, setLikeCount] = useState(report.likeCount)
+  const [hasLiked, setHasLiked] = useState(false)
+  const [liking, setLiking] = useState(false)
+
+  useEffect(() => {
+    if (!user) return
+    apiFetch<{ liked: boolean }>(`/reports/${report._id}/likes/me`)
+      .then((data) => setHasLiked(data.liked))
+      .catch(() => {})
+  }, [report._id, user])
+
+  async function toggleLike() {
+    if (!user || liking) return
+    setLiking(true)
+    try {
+      const method = hasLiked ? 'DELETE' : 'POST'
+      const res = await apiFetch<{ likeCount: number }>(`/reports/${report._id}/likes`, { method })
+      setLikeCount(res.likeCount)
+      setHasLiked(!hasLiked)
+      onLikeChange?.(report._id, res.likeCount)
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message === 'Already liked') setHasLiked(true)
+    } finally {
+      setLiking(false)
+    }
+  }
+
   return (
     <motion.div
       className="report-sheet"
@@ -61,9 +95,19 @@ export function ReportSheet({ report, category, onClose }: Props) {
           })}
         </p>
         <div className="report-sheet__stats">
-          <span>👍 {report.likeCount}</span>
+          <button
+            className={`report-sheet__like-btn${hasLiked ? ' report-sheet__like-btn--active' : ''}`}
+            onClick={toggleLike}
+            disabled={!user || liking}
+            title={!user ? 'Log in to like' : undefined}
+          >
+            👍 {likeCount}
+          </button>
           <span>💬 {report.commentCount}</span>
         </div>
+        <button className="report-sheet__open-btn" onClick={onOpen}>
+          View details →
+        </button>
       </div>
     </motion.div>
   )

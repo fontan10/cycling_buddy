@@ -59,13 +59,22 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Check if current user has liked a report
+router.get('/:id/likes/me', requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const liked = await ReportLike.exists({ reportId: req.params.id, userId: req.userId });
+    res.json({ liked: !!liked });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 // Like a report
 router.post('/:id/likes', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     await ReportLike.create({ reportId: req.params.id, userId: req.userId });
-    const likeCount = await ReportLike.countDocuments({ reportId: req.params.id });
-    await Report.findByIdAndUpdate(req.params.id, { likeCount });
-    res.status(201).json({ likeCount });
+    const report = await Report.findByIdAndUpdate(req.params.id, { $inc: { likeCount: 1 } }, { new: true });
+    res.status(201).json({ likeCount: report!.likeCount });
   } catch (err: any) {
     if (err.code === 11000) return res.status(409).json({ error: 'Already liked' });
     res.status(400).json({ error: err.message });
@@ -77,9 +86,8 @@ router.delete('/:id/likes', requireAuth, async (req: AuthRequest, res: Response)
   try {
     const like = await ReportLike.findOneAndDelete({ reportId: req.params.id, userId: req.userId });
     if (!like) return res.status(404).json({ error: 'Like not found' });
-    const likeCount = await ReportLike.countDocuments({ reportId: req.params.id });
-    await Report.findByIdAndUpdate(req.params.id, { likeCount });
-    res.json({ likeCount });
+    const report = await Report.findByIdAndUpdate(req.params.id, { $inc: { likeCount: -1 } }, { new: true });
+    res.json({ likeCount: report!.likeCount });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }

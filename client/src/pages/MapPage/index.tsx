@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
-import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
@@ -11,8 +11,37 @@ import type { Report } from '../../types'
 import { CATEGORIES } from '../../data/categories'
 import { DEFAULT_CENTER } from '../../data/map'
 import { ReportSheet } from './ReportSheet'
+import { ReportDetail } from './ReportDetail'
 import './MapPage.css'
 
+
+// ReportDetail covers the bottom 62% of the map (top: 38%).
+// To center the marker in the visible 38%, offset the flyTo target downward
+// in world-pixel space by half the hidden panel height.
+const PANEL_FRACTION = 0.62
+
+function MapController({ active, coords }: { active: boolean; coords: { lat: number; lng: number } | null }) {
+  const map = useMap()
+  const savedView = useRef<{ center: L.LatLng; zoom: number } | null>(null)
+
+  useEffect(() => {
+    if (active && coords) {
+      if (!savedView.current) {
+        savedView.current = { center: map.getCenter(), zoom: map.getZoom() }
+      }
+      const zoom = Math.max(map.getZoom(), 15)
+      const yOffset = (map.getSize().y * PANEL_FRACTION) / 2
+      const targetPx = map.project([coords.lat, coords.lng], zoom)
+      const adjustedLatLng = map.unproject(L.point(targetPx.x, targetPx.y + yOffset), zoom)
+      map.flyTo(adjustedLatLng, zoom, { duration: 0.8 })
+    } else if (!active && savedView.current) {
+      map.flyTo(savedView.current.center, savedView.current.zoom, { duration: 0.8 })
+      savedView.current = null
+    }
+  }, [active, coords, map])
+
+  return null
+}
 
 let cachedReports: Report[] | null = null
 
@@ -34,6 +63,7 @@ export function MapPage() {
   const [loading, setLoading] = useState(cachedReports === null)
   const [error, setError] = useState(false)
   const [selected, setSelected] = useState<Report | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
 
   useEffect(() => {
     if (cachedReports !== null) return
@@ -95,6 +125,8 @@ export function MapPage() {
             )
           })}
         </MarkerClusterGroup>
+
+        <MapController active={detailOpen} coords={selected?.coords ?? null} />
       </MapContainer>
 
       {loading && (
@@ -117,12 +149,31 @@ export function MapPage() {
       )}
 
       <AnimatePresence>
-        {selected && selectedCat && (
+        {selected && selectedCat && !detailOpen && (
           <ReportSheet
             key={selected._id}
             report={selected}
             category={selectedCat}
-            onClose={() => setSelected(null)}
+            onClose={() => { setSelected(null); setDetailOpen(false) }}
+            onOpen={() => setDetailOpen(true)}
+            onLikeChange={(id, likeCount) => {
+              setReports((prev) => prev.map((r) => r._id === id ? { ...r, likeCount } : r))
+              setSelected((prev) => prev?._id === id ? { ...prev, likeCount } : prev)
+              if (cachedReports) cachedReports = cachedReports.map((r) => r._id === id ? { ...r, likeCount } : r)
+            }}
+          />
+        )}
+        {selected && selectedCat && detailOpen && (
+          <ReportDetail
+            key={`detail-${selected._id}`}
+            report={selected}
+            category={selectedCat}
+            onClose={() => setDetailOpen(false)}
+            onLikeChange={(id, likeCount) => {
+              setReports((prev) => prev.map((r) => r._id === id ? { ...r, likeCount } : r))
+              setSelected((prev) => prev?._id === id ? { ...prev, likeCount } : prev)
+              if (cachedReports) cachedReports = cachedReports.map((r) => r._id === id ? { ...r, likeCount } : r)
+            }}
           />
         )}
       </AnimatePresence>
