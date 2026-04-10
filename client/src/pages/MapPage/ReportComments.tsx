@@ -12,6 +12,73 @@ interface Comment {
   liked: boolean
 }
 
+interface CommentItemProps {
+  comment: Comment
+  likeState: { count: number; liked: boolean }
+  canDelete: boolean
+  isDeleting: boolean
+  onToggleLike: () => void
+  onDelete: () => void
+}
+
+function CommentItem({ comment, likeState, canDelete, isDeleting, onToggleLike, onDelete }: CommentItemProps) {
+  const { user } = useAuth()
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  return (
+    <li className="report-detail__comment">
+      <p className="report-detail__comment-text">{comment.text}</p>
+      <div className="report-detail__comment-footer">
+        <span className="report-detail__comment-date">
+          {new Date(comment.createdAt).toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric',
+          })}
+        </span>
+        <div className="report-detail__comment-actions">
+          <button
+            className={`report-detail__comment-like${likeState.liked ? ' report-detail__comment-like--active' : ''}`}
+            onClick={onToggleLike}
+            disabled={!user}
+            title={!user ? 'Log in to like' : undefined}
+          >
+            👍 {likeState.count}
+          </button>
+          {canDelete && (
+            confirmDelete ? (
+              <span className="report-detail__confirm-delete">
+                <span className="report-detail__confirm-label">Delete?</span>
+                <button
+                  className="report-detail__confirm-yes"
+                  onClick={() => { setConfirmDelete(false); onDelete() }}
+                  disabled={isDeleting}
+                >
+                  Yes
+                </button>
+                <button
+                  className="report-detail__confirm-no"
+                  onClick={() => setConfirmDelete(false)}
+                >
+                  No
+                </button>
+              </span>
+            ) : (
+              <button
+                className="report-detail__comment-delete"
+                onClick={() => setConfirmDelete(true)}
+                disabled={isDeleting}
+                title="Delete comment"
+              >
+                {isDeleting ? 'Deleting…' : 'Delete'}
+              </button>
+            )
+          )}
+        </div>
+      </div>
+    </li>
+  )
+}
+
 interface Props {
   reportId: string
   onCountChange?: (count: number) => void
@@ -27,7 +94,6 @@ export function ReportComments({ reportId, onCountChange }: Props) {
   const [commentText, setCommentText] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [posted, setPosted] = useState(false)
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -65,7 +131,6 @@ export function ReportComments({ reportId, onCountChange }: Props) {
   }
 
   async function deleteComment(commentId: string) {
-    setConfirmDeleteId(null)
     setDeletingId(commentId)
     try {
       await apiFetch(`/comments/${commentId}`, { method: 'DELETE' })
@@ -155,61 +220,17 @@ export function ReportComments({ reportId, onCountChange }: Props) {
         <p className="report-detail__empty">No comments yet — be the first!</p>
       ) : (
         <ul className="report-detail__comment-list">
-          {comments.map((c) => {
-            const cl = commentLikes[c._id] ?? { count: 0, liked: false }
-            return (
-              <li key={c._id} className="report-detail__comment">
-                <p className="report-detail__comment-text">{c.text}</p>
-                <div className="report-detail__comment-footer">
-                  <span className="report-detail__comment-date">
-                    {new Date(c.createdAt).toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </span>
-                  <div className="report-detail__comment-actions">
-                    <button
-                      className={`report-detail__comment-like${cl.liked ? ' report-detail__comment-like--active' : ''}`}
-                      onClick={() => toggleCommentLike(c._id)}
-                      disabled={!user}
-                      title={!user ? 'Log in to like' : undefined}
-                    >
-                      👍 {cl.count}
-                    </button>
-                    {user && user._id === c.userId && (
-                      confirmDeleteId === c._id ? (
-                        <span className="report-detail__confirm-delete">
-                          <span className="report-detail__confirm-label">Delete?</span>
-                          <button
-                            className="report-detail__confirm-yes"
-                            onClick={() => deleteComment(c._id)}
-                            disabled={deletingId === c._id}
-                          >
-                            Yes
-                          </button>
-                          <button
-                            className="report-detail__confirm-no"
-                            onClick={() => setConfirmDeleteId(null)}
-                          >
-                            No
-                          </button>
-                        </span>
-                      ) : (
-                        <button
-                          className="report-detail__comment-delete"
-                          onClick={() => setConfirmDeleteId(c._id)}
-                          disabled={deletingId === c._id}
-                          title="Delete comment"
-                        >
-                          {deletingId === c._id ? 'Deleting…' : 'Delete'}
-                        </button>
-                      )
-                    )}
-                  </div>
-                </div>
-              </li>
-            )
-          })}
+          {comments.map((c) => (
+            <CommentItem
+              key={c._id}
+              comment={c}
+              likeState={commentLikes[c._id] ?? { count: 0, liked: false }}
+              canDelete={!!user && user._id === c.userId}
+              isDeleting={deletingId === c._id}
+              onToggleLike={() => toggleCommentLike(c._id)}
+              onDelete={() => deleteComment(c._id)}
+            />
+          ))}
         </ul>
       )}
     </section>

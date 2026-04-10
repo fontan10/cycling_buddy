@@ -16,13 +16,6 @@ router.get('/reports/:reportId/comments', optionalAuth, async (req: AuthRequest,
 
     const commentIds = comments.map((c) => c._id);
 
-    const likeCounts = await ReportCommentLike.aggregate([
-      { $match: { commentId: { $in: commentIds } } },
-      { $group: { _id: '$commentId', count: { $sum: 1 } } },
-    ]);
-    const likeCountMap: Record<string, number> = {};
-    likeCounts.forEach((l) => { likeCountMap[l._id.toString()] = l.count; });
-
     const userLikedSet = new Set<string>();
     if (req.userId) {
       const userLikes = await ReportCommentLike.find({
@@ -34,7 +27,6 @@ router.get('/reports/:reportId/comments', optionalAuth, async (req: AuthRequest,
 
     const result = comments.map((c) => ({
       ...c.toObject(),
-      likeCount: likeCountMap[c._id.toString()] ?? 0,
       liked: userLikedSet.has(c._id.toString()),
     }));
 
@@ -88,8 +80,12 @@ router.delete('/comments/:id', requireAuth, async (req: AuthRequest, res: Respon
 router.post('/comments/:id/likes', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     await ReportCommentLike.create({ commentId: req.params.id, userId: req.userId });
-    const likeCount = await ReportCommentLike.countDocuments({ commentId: req.params.id });
-    res.status(201).json({ likeCount });
+    const updated = await ReportComment.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likeCount: 1 } },
+      { new: true },
+    );
+    res.status(201).json({ likeCount: updated?.likeCount ?? 0 });
   } catch (err: any) {
     if (err.code === 11000) return res.status(409).json({ error: 'Already liked' });
     res.status(400).json({ error: err.message });
@@ -101,8 +97,12 @@ router.delete('/comments/:id/likes', requireAuth, async (req: AuthRequest, res: 
   try {
     const like = await ReportCommentLike.findOneAndDelete({ commentId: req.params.id, userId: req.userId });
     if (!like) return res.status(404).json({ error: 'Like not found' });
-    const likeCount = await ReportCommentLike.countDocuments({ commentId: req.params.id });
-    res.json({ likeCount });
+    const updated = await ReportComment.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likeCount: -1 } },
+      { new: true },
+    );
+    res.json({ likeCount: updated?.likeCount ?? 0 });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }
