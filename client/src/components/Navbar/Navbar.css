@@ -13,10 +13,13 @@
   gap: var(--space-sm);
 }
 
-.navbar__bike {
-  font-size: 20px;
-  display: inline-block;
-  transform: scaleX(-1);
+.navbar__logo {
+  flex-shrink: 0;
+  transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.navbar__brand:hover .navbar__logo {
+  transform: rotate(-8deg) scale(1.08);
 }
 
 .navbar__title {
@@ -25,6 +28,10 @@
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.01em;
+}
+
+.navbar__title-accent {
+  color: var(--color-primary);
 }
 
 /* ── Profile button ── */

@@ -32,6 +32,60 @@ const checkIcon = (
   </svg>
 )
 
+const CyclingBuddyLogo = () => (
+  <svg
+    className="navbar__logo"
+    width="32"
+    height="32"
+    viewBox="0 0 36 36"
+    fill="none"
+    aria-hidden="true"
+  >
+    <defs>
+      <linearGradient id="cb-logo-bg" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#5BC8FF" />
+        <stop offset="100%" stopColor="#1A9FEF" />
+      </linearGradient>
+    </defs>
+
+    {/* Background circle */}
+    <circle cx="18" cy="18" r="18" fill="url(#cb-logo-bg)" />
+
+    {/* Rear wheel */}
+    <circle cx="10" cy="24" r="5.5" stroke="#FFD600" strokeWidth="2" />
+    <circle cx="10" cy="24" r="1.3" fill="#FFD600" />
+
+    {/* Front wheel */}
+    <circle cx="26" cy="24" r="5.5" stroke="#FFD600" strokeWidth="2" />
+    <circle cx="26" cy="24" r="1.3" fill="#FFD600" />
+
+    {/* Frame — rear triangle */}
+    <line x1="10" y1="24" x2="18" y2="24" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="18" y1="24" x2="14" y2="13" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="10" y1="24" x2="14" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+
+    {/* Frame — main triangle */}
+    <line x1="14" y1="13" x2="23" y2="13" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="18" y1="24" x2="23" y2="13" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+
+    {/* Fork */}
+    <line x1="23" y1="13" x2="26" y2="24" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+
+    {/* Seat */}
+    <line x1="14" y1="11" x2="14" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="11" y1="11" x2="17" y2="11" stroke="#FFD600" strokeWidth="2.5" strokeLinecap="round" />
+
+    {/* Handlebars */}
+    <line x1="23" y1="11" x2="23" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="21" y1="11" x2="25" y2="11" stroke="white" strokeWidth="2" strokeLinecap="round" />
+
+    {/* Sparkle dots */}
+    <circle cx="30" cy="7" r="2.5" fill="#7ED957" />
+    <circle cx="32" cy="12" r="1.3" fill="#7ED957" opacity="0.65" />
+    <circle cx="6" cy="7" r="1.5" fill="#FFD600" opacity="0.85" />
+  </svg>
+)
+
 export function Navbar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -62,8 +116,8 @@ export function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar__brand">
-        <span className="navbar__bike" aria-hidden="true">🚲</span>
-        <span className="navbar__title">Cycling Buddy</span>
+        <CyclingBuddyLogo />
+        <span className="navbar__title">Cycling<span className="navbar__title-accent">Buddy</span></span>
       </div>
 
       <div className="navbar__profile-wrap" ref={menuRef}>
