@@ -84,6 +84,8 @@ interface Props {
   onCountChange?: (count: number) => void
 }
 
+// TODO: load and cache the comments when first clicking on the report so the user does not have to wait for them to load. If the user clicks away, then remove it from the cache
+// TODO: if the commentCount is 0, then do not attempt to load
 export function ReportComments({ reportId, onCountChange }: Props) {
   const { user } = useAuth()
 

@@ -1,0 +1,83 @@
+.locate-btn-wrap {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-xs);
+  pointer-events: none;
+}
+
+/*
+ * Map-overlay exception: buttons floating over the map use a filled
+ * primary background instead of --surface-container-lowest. The tile
+ * layer is light, so a white button has near-zero contrast. A filled
+ * colour plus a coloured press-shadow gives the required legibility.
+ */
+.locate-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-circle);
+  background: var(--color-primary);
+  border: none;
+  box-shadow: 0 4px 0 #1a8fd1, 0 6px 20px rgba(56, 182, 255, 0.40);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+@media (hover: hover) {
+  .locate-btn:hover {
+    background: #1aa9f0;
+  }
+}
+
+.locate-btn:active {
+  background: #1aa9f0;
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.locate-btn--loading {
+  cursor: default;
+}
+
+.locate-btn__icon {
+  width: 20px;
+  height: 20px;
+}
+
+.locate-btn__spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: var(--radius-circle);
+  display: block;
+  animation: locate-spin 0.7s linear infinite;
+}
+
+@keyframes locate-spin {
+  to { transform: rotate(360deg); }
+}
+
+.locate-denied {
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-float);
+  padding: var(--space-xs) var(--space-md);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-danger);
+  white-space: nowrap;
+  pointer-events: none;
+}

@@ -12,6 +12,7 @@ import { CATEGORIES } from '../../data/categories'
 import { DEFAULT_CENTER } from '../../data/map'
 import { getUserLocation } from '../../data/userLocation'
 import { UserLocationMarker } from '../../components/UserLocationMarker'
+import { CenterOnUserButton } from '../../components/CenterOnUserButton'
 import { ReportSheet } from './ReportSheet'
 import { ReportDetail } from './ReportDetail'
 import './MapPage.css'
@@ -72,6 +73,7 @@ function UserLocationFly({ coords }: { coords: [number, number] | null }) {
   return null
 }
 
+// TODO: do not zoom in sooo much on the map page
 export function MapPage() {
   const [reports, setReports] = useState<Report[]>(cachedReports ?? [])
   const [loading, setLoading] = useState(cachedReports === null)
@@ -150,6 +152,7 @@ export function MapPage() {
         <MapController active={detailOpen} coords={selected?.coords ?? null} />
         <UserLocationFly coords={userLocation} />
         <UserLocationMarker coords={userLocation} />
+        <CenterOnUserButton onLocate={(coords) => setUserLocation(coords)} />
       </MapContainer>
 
       {loading && (

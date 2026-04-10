@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css'
 import { DEFAULT_CENTER } from '../../data/map'
 import { setCachedUserLocation } from '../../data/userLocation'
 import { UserLocationMarker } from '../UserLocationMarker'
+import { CenterOnUserButton } from '../CenterOnUserButton'
 import './LocationPicker.css'
 
 // ── Custom pin icon (avoids Leaflet's broken default in Vite) ──
@@ -197,6 +198,7 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
         <FlyTo coords={flyTarget} />
         {pin && <Marker position={[pin.lat, pin.lng]} icon={PIN_ICON} />}
         <UserLocationMarker coords={userGpsCoords} />
+        <CenterOnUserButton onLocate={(coords) => setUserGpsCoords(coords)} />
       </MapContainer>
 
       {/* Resolved address / hint */}
