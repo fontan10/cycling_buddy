@@ -47,6 +47,31 @@
   padding: 0;
 }
 
+/* ── User location marker (shared across all maps) ────────────── */
+.user-location-marker {
+  width: 18px;
+  height: 18px;
+  background: var(--color-primary);
+  border: 3px solid var(--surface-container-lowest);
+  border-radius: var(--radius-circle);
+  box-shadow: 0 2px 8px rgba(44, 62, 107, 0.30);
+  position: relative;
+}
+
+.user-location-marker::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: var(--radius-circle);
+  background: rgba(56, 182, 255, 0.22);
+  animation: user-loc-pulse 2s ease-out infinite;
+}
+
+@keyframes user-loc-pulse {
+  0%   { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
 html, body, #root {
   height: 100%;
 }

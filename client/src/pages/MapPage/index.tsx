@@ -10,6 +10,8 @@ import 'react-leaflet-markercluster/styles'
 import type { Report } from '../../types'
 import { CATEGORIES } from '../../data/categories'
 import { DEFAULT_CENTER } from '../../data/map'
+import { getUserLocation } from '../../data/userLocation'
+import { UserLocationMarker } from '../../components/UserLocationMarker'
 import { ReportSheet } from './ReportSheet'
 import { ReportDetail } from './ReportDetail'
 import './MapPage.css'
@@ -58,12 +60,31 @@ function makeMarkerIcon(color: string, active = false) {
   })
 }
 
+function UserLocationFly({ coords }: { coords: [number, number] | null }) {
+  const map = useMap()
+  const flown = useRef(false)
+  useEffect(() => {
+    if (coords && !flown.current) {
+      flown.current = true
+      map.flyTo(coords, 15, { duration: 1 })
+    }
+  }, [coords, map])
+  return null
+}
+
 export function MapPage() {
   const [reports, setReports] = useState<Report[]>(cachedReports ?? [])
   const [loading, setLoading] = useState(cachedReports === null)
   const [error, setError] = useState(false)
   const [selected, setSelected] = useState<Report | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
+
+  useEffect(() => {
+    getUserLocation().then((coords) => {
+      if (coords) setUserLocation([coords.lat, coords.lng])
+    })
+  }, [])
 
   useEffect(() => {
     if (cachedReports !== null) return
@@ -127,6 +148,8 @@ export function MapPage() {
         </MarkerClusterGroup>
 
         <MapController active={detailOpen} coords={selected?.coords ?? null} />
+        <UserLocationFly coords={userLocation} />
+        <UserLocationMarker coords={userLocation} />
       </MapContainer>
 
       {loading && (

@@ -4,6 +4,8 @@ import L from 'leaflet'
 import type { LatLng } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { DEFAULT_CENTER } from '../../data/map'
+import { setCachedUserLocation } from '../../data/userLocation'
+import { UserLocationMarker } from '../UserLocationMarker'
 import './LocationPicker.css'
 
 // ── Custom pin icon (avoids Leaflet's broken default in Vite) ──
@@ -78,6 +80,7 @@ function FlyTo({ coords }: { coords: Coords | null }) {
 export function LocationPicker({ onChange }: LocationPickerProps) {
   const [pin, setPin] = useState<Coords | null>(null)
   const [flyTarget, setFlyTarget] = useState<Coords | null>(null)
+  const [userGpsCoords, setUserGpsCoords] = useState<[number, number] | null>(null)
   const [address, setAddress] = useState<DisplayAddress | null>(null)
   const [resolving, setResolving] = useState(false)
   const [query, setQuery] = useState('')
@@ -87,7 +90,10 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
   // Centre on device GPS when the map first loads
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition((pos) => {
-      setFlyTarget({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+      const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+      setCachedUserLocation(coords)
+      setFlyTarget(coords)
+      setUserGpsCoords([pos.coords.latitude, pos.coords.longitude])
     })
   }, [])
 
@@ -190,6 +196,7 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
         <TapHandler onTap={handleTap} />
         <FlyTo coords={flyTarget} />
         {pin && <Marker position={[pin.lat, pin.lng]} icon={PIN_ICON} />}
+        <UserLocationMarker coords={userGpsCoords} />
       </MapContainer>
 
       {/* Resolved address / hint */}

@@ -5,10 +5,35 @@ import { requireAuth, optionalAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
-// List all reports (non-deleted)
-router.get('/', async (_req, res) => {
+// List all reports (non-deleted), with optional proximity filter:
+//   ?lat=<latitude>&lng=<longitude>&radius=<meters>  (radius defaults to 5000m)
+router.get('/', async (req, res) => {
   try {
-    const reports = await Report.find({ isDeleted: false }).sort({ createdAt: -1 });
+    const { lat, lng, radius } = req.query;
+    const filter: Record<string, unknown> = { isDeleted: false };
+
+    if (lat !== undefined && lng !== undefined) {
+      const parsedLat = parseFloat(lat as string);
+      const parsedLng = parseFloat(lng as string);
+      const maxDistance = radius !== undefined ? parseFloat(radius as string) : 5000;
+
+      if (isNaN(parsedLat) || isNaN(parsedLng) || isNaN(maxDistance)) {
+        return res.status(400).json({ error: 'lat, lng, and radius must be valid numbers' });
+      }
+
+      filter.location = {
+        $near: {
+          $geometry: { type: 'Point', coordinates: [parsedLng, parsedLat] },
+          $maxDistance: maxDistance,
+        },
+      };
+    }
+
+    // $near returns results sorted by distance; fall back to createdAt for unfiltered queries
+    const reports = lat !== undefined
+      ? await Report.find(filter)
+      : await Report.find(filter).sort({ createdAt: -1 });
+
     res.json(reports);
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
@@ -34,6 +59,10 @@ router.post('/', optionalAuth, async (req: AuthRequest, res: Response) => {
       categoryId,
       address,
       coords,
+      location: {
+        type: 'Point',
+        coordinates: [coords.lng, coords.lat],
+      },
       description,
       photoUrl,
       userId: req.userId ?? null,

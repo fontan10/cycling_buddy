@@ -9,6 +9,11 @@ const reportSchema = new Schema(
       lat: { type: Number, required: true },
       lng: { type: Number, required: true },
     },
+    // GeoJSON Point — enables $near / $geoWithin queries with a 2dsphere index
+    location: {
+      type:        { type: String, enum: ['Point'], required: true },
+      coordinates: { type: [Number], required: true }, // [longitude, latitude]
+    },
     description:  { type: String, default: '' },
     photoUrl:     { type: String, default: '' },
     likeCount:    { type: Number, default: 0 },
@@ -18,5 +23,7 @@ const reportSchema = new Schema(
   },
   { timestamps: true },
 );
+
+reportSchema.index({ location: '2dsphere' });
 
 export const Report = model('Report', reportSchema);
