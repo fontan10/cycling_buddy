@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react'
 import type { ReactNode } from 'react'
-import { apiFetch } from '../lib/api'
+import { apiFetch, BASE } from '../lib/api'
 
 export interface User {
   _id: string
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const loginWithGoogle = useCallback(() => {
-    window.location.href = '/api/auth/google'
+    window.location.href = `${BASE}/auth/google`
   }, [])
 
   const handleOAuthCallback = useCallback(
