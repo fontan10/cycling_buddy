@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import L from 'leaflet'
+import { useEffect, useRef, useState } from 'react'
 import { useMap } from 'react-leaflet'
 import { getUserLocation } from '../../data/userLocation'
 import './CenterOnUserButton.css'
@@ -8,13 +9,16 @@ interface Props {
   onLocate?: (coords: [number, number]) => void
 }
 
-// BUG: when clicking on the button it still registers on a click on the map beneath it
-// TODO: choose another colour for the user's location and correspondingly update the button as well
 // TODO: make the location unavaiable error message appear nicer
 export function CenterOnUserButton({ onLocate }: Props) {
   const map = useMap()
   const [loading, setLoading] = useState(false)
   const [denied, setDenied] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (wrapRef.current) L.DomEvent.disableClickPropagation(wrapRef.current)
+  }, [])
 
   async function handleClick() {
     if (loading) return
@@ -24,7 +28,10 @@ export function CenterOnUserButton({ onLocate }: Props) {
     setLoading(false)
     if (coords) {
       const latlng: [number, number] = [coords.lat, coords.lng]
-      map.flyTo(latlng, Math.max(map.getZoom(), 15), { duration: 1 })
+      const targetZoom = Math.max(map.getZoom(), 15)
+      const alreadyCentered =
+        map.getCenter().distanceTo(latlng) < 5 && map.getZoom() === targetZoom
+      if (!alreadyCentered) map.flyTo(latlng, targetZoom, { duration: 1 })
       onLocate?.(latlng)
     } else {
       setDenied(true)
@@ -33,7 +40,7 @@ export function CenterOnUserButton({ onLocate }: Props) {
   }
 
   return (
-    <div className="locate-btn-wrap">
+    <div className="locate-btn-wrap" ref={wrapRef}>
       <button
         className={`locate-btn${loading ? ' locate-btn--loading' : ''}`}
         onClick={handleClick}
