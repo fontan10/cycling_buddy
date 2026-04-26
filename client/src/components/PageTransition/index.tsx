@@ -11,12 +11,12 @@ const variants = {
   enter: {
     x: 0,
     opacity: 1,
-    transition: { type: 'tween', duration: 0.3, ease: [0.4, 0, 0.2, 1] },
+    transition: { type: 'tween' as const, duration: 0.3, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] },
   },
   exit: (back: boolean) => ({
     x: back ? '100%' : '-100%',
     opacity: 0.85,
-    transition: { type: 'tween', duration: 0.3, ease: [0.4, 0, 0.2, 1] },
+    transition: { type: 'tween' as const, duration: 0.3, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] },
   }),
 }
 
