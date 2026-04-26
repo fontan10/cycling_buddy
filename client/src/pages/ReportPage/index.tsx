@@ -59,7 +59,7 @@ function PhotoField({ preview, onChange, onClear }: {
   onClear: () => void
 }) {
   const fileInput = (
-    <input id="photo" type="file" accept="image/*" capture="environment" className="photo-upload__input" onChange={onChange} />
+    <input id="photo" type="file" accept="image/*" className="photo-upload__input" onChange={onChange} />
   )
 
   if (preview) {
@@ -131,10 +131,10 @@ export function ReportPage() {
 
   function getCompressionOptions() {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4
-    if (memory <= 1) return { maxSizeMB: 0.3, maxWidthOrHeight: 640,  useWebWorker: false }
-    if (memory <= 2) return { maxSizeMB: 0.5, maxWidthOrHeight: 800,  useWebWorker: false }
-    if (memory <= 4) return { maxSizeMB: 1.0, maxWidthOrHeight: 1024, useWebWorker: false }
-    return                 { maxSizeMB: 1.5, maxWidthOrHeight: 1280, useWebWorker: true  }
+    if (memory <= 1) return { maxSizeMB: 0.3, maxWidthOrHeight: 640,  useWebWorker: false, fileType: 'image/jpeg' }
+    if (memory <= 2) return { maxSizeMB: 0.5, maxWidthOrHeight: 800,  useWebWorker: false, fileType: 'image/jpeg' }
+    if (memory <= 4) return { maxSizeMB: 1.0, maxWidthOrHeight: 1024, useWebWorker: false, fileType: 'image/jpeg' }
+    return                 { maxSizeMB: 1.5, maxWidthOrHeight: 1280, useWebWorker: true,  fileType: 'image/jpeg' }
   }
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
