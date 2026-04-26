@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import imageCompression from 'browser-image-compression'
 import { CATEGORIES } from '../../data/categories'
 import { LocationPicker } from '../../components/LocationPicker'
 import { clearReportsCache } from '../MapPage'
@@ -39,12 +40,12 @@ export function ReportPage() {
     try {
       let photoUrl = ''
       if (photo) {
-        photoUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = () => resolve(reader.result as string)
-          reader.onerror = reject
-          reader.readAsDataURL(photo)
+        const compressed = await imageCompression(photo, {
+          maxSizeMB: 2.5,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true,
         })
+        photoUrl = await imageCompression.getDataUrlFromFile(compressed)
       }
 
       await apiFetch('/reports', {

@@ -12,8 +12,8 @@ dotenv.config();
 const app = express();
 
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // required for Apple's form POST callback
+app.use(express.json({ limit: '4mb' }));
+app.use(express.urlencoded({ extended: true, limit: '4mb' })); // required for Apple's form POST callback
 app.use(passport.initialize());
 
 app.use((_req: Request, _res: Response, next: NextFunction) => {
