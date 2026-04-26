@@ -8,6 +8,7 @@ import MarkerClusterGroup from 'react-leaflet-markercluster'
 // @ts-ignore
 import 'react-leaflet-markercluster/styles'
 import type { Report } from '../../types'
+import { apiFetch } from '../../lib/api'
 import { CATEGORIES } from '../../data/categories'
 import { DEFAULT_CENTER } from '../../data/map'
 import { getUserLocation } from '../../data/userLocation'
@@ -90,11 +91,7 @@ export function MapPage() {
 
   useEffect(() => {
     if (cachedReports !== null) return
-    fetch('/api/reports')
-      .then((r) => {
-        if (!r.ok) throw new Error()
-        return r.json()
-      })
+    apiFetch<Report[]>('/reports')
       .then((data) => {
         cachedReports = data
         setReports(data)

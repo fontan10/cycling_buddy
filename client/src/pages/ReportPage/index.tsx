@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { CATEGORIES } from '../../data/categories'
 import { LocationPicker } from '../../components/LocationPicker'
 import { clearReportsCache } from '../MapPage'
+import { apiFetch } from '../../lib/api'
 import './ReportPage.css'
 
 interface Coords { lat: number; lng: number }
@@ -46,9 +47,8 @@ export function ReportPage() {
         })
       }
 
-      const res = await fetch('/api/reports', {
+      await apiFetch('/reports', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           categoryId,
           address: location.address,
@@ -58,7 +58,6 @@ export function ReportPage() {
         }),
       })
 
-      if (!res.ok) throw new Error('Failed to save report')
       clearReportsCache()
       navigate('/success', { state: { categoryId } })
     } catch {
