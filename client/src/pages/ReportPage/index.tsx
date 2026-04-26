@@ -129,6 +129,14 @@ export function ReportPage() {
     return next
   }
 
+  function getCompressionOptions() {
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4
+    if (memory <= 1) return { maxSizeMB: 0.3, maxWidthOrHeight: 640,  useWebWorker: false }
+    if (memory <= 2) return { maxSizeMB: 0.5, maxWidthOrHeight: 800,  useWebWorker: false }
+    if (memory <= 4) return { maxSizeMB: 1.0, maxWidthOrHeight: 1024, useWebWorker: false }
+    return                 { maxSizeMB: 1.5, maxWidthOrHeight: 1280, useWebWorker: true  }
+  }
+
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     const next = validate()
@@ -139,11 +147,7 @@ export function ReportPage() {
     try {
       let photoUrl = ''
       if (photo) {
-        const compressed = await imageCompression(photo, {
-          maxSizeMB: 2.5,
-          maxWidthOrHeight: 1024,
-          useWebWorker: true,
-        })
+        const compressed = await imageCompression(photo, getCompressionOptions())
         photoUrl = await imageCompression.getDataUrlFromFile(compressed)
       }
 
