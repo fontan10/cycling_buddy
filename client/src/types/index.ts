@@ -18,3 +18,11 @@ export interface Category {
 }
 
 export type Tab = 'map' | 'report' | 'badges'
+
+export interface Team {
+  _id: string
+  name: string
+  photoUrl: string
+  teamCode: string
+  createdAt: string
+}

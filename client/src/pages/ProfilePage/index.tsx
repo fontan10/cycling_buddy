@@ -4,6 +4,7 @@ import imageCompression from 'browser-image-compression'
 import { useAuth } from '../../context/AuthContext'
 import type { User } from '../../context/AuthContext'
 import { apiFetch } from '../../lib/api'
+import type { Team } from '../../types'
 import './ProfilePage.css'
 
 function getCompressionOptions() {
@@ -118,6 +119,56 @@ export function ProfilePage() {
       setAvatarError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setAvatarLoading(false)
+    }
+  }
+
+  // ── Team section ─────────────────────────────────────────────────────────
+  const [team, setTeam] = useState<Team | null | undefined>(undefined)
+  const [teamLoading, setTeamLoading] = useState(false)
+  const [teamError, setTeamError] = useState('')
+  const [teamName, setTeamName] = useState('')
+  const [teamPhotoFile, setTeamPhotoFile] = useState<File | null>(null)
+  const [teamPhotoPreview, setTeamPhotoPreview] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!user?.isCoach) return
+    apiFetch<{ team: Team | null }>('/teams/mine')
+      .then(({ team: t }) => setTeam(t))
+      .catch(() => setTeam(null))
+  }, [user?.isCoach])
+
+  function handleTeamPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null
+    if (teamPhotoPreview) URL.revokeObjectURL(teamPhotoPreview)
+    setTeamPhotoFile(file)
+    setTeamPhotoPreview(file ? URL.createObjectURL(file) : null)
+    e.target.value = ''
+  }
+
+  async function handleCreateTeam(e: React.FormEvent) {
+    e.preventDefault()
+    if (!teamName.trim()) return
+    setTeamError('')
+    setTeamLoading(true)
+    try {
+      let photoUrl = ''
+      if (teamPhotoFile) {
+        const compressed = await imageCompression(teamPhotoFile, getCompressionOptions())
+        photoUrl = await imageCompression.getDataUrlFromFile(compressed)
+      }
+      const { team: created } = await apiFetch<{ team: Team }>('/teams', {
+        method: 'POST',
+        body: JSON.stringify({ name: teamName.trim(), photoUrl }),
+      })
+      setTeam(created)
+      setTeamName('')
+      if (teamPhotoPreview) URL.revokeObjectURL(teamPhotoPreview)
+      setTeamPhotoFile(null)
+      setTeamPhotoPreview(null)
+    } catch (err) {
+      setTeamError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setTeamLoading(false)
     }
   }
 
@@ -401,6 +452,76 @@ export function ProfilePage() {
             </>
           )}
         </section>
+
+        {/* ── My Team (coach only) ── */}
+        {user?.isCoach && (
+          <section className="profile-page__card">
+            <h2 className="profile-page__section-title">My Team</h2>
+
+            {team === undefined && (
+              <p className="profile-page__coach-desc">Loading…</p>
+            )}
+
+            {team === null && (
+              <form onSubmit={handleCreateTeam} className="profile-page__form">
+                <div className="profile-page__field">
+                  <label className="profile-page__label" htmlFor="teamName">Team Name</label>
+                  <div className="profile-page__input-wrap">
+                    <input
+                      id="teamName"
+                      className="profile-page__input"
+                      type="text"
+                      placeholder="e.g. Weekend Warriors"
+                      value={teamName}
+                      onChange={e => setTeamName(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="profile-page__field">
+                  <label className="profile-page__label">Team Photo</label>
+                  <div className="profile-page__team-photo-row">
+                    <div className="profile-page__avatar-wrap">
+                      {teamPhotoPreview ? (
+                        <img className="profile-page__avatar-img" src={teamPhotoPreview} alt="Team photo preview" />
+                      ) : (
+                        <div className="profile-page__avatar-placeholder"><CameraIcon /></div>
+                      )}
+                      <label className="profile-page__avatar-overlay" aria-label="Choose team photo">
+                        <CameraIcon />
+                        <input type="file" accept="image/*" className="profile-page__file-input" onChange={handleTeamPhotoChange} />
+                      </label>
+                    </div>
+                    <p className="profile-page__coach-desc">Optional — tap the circle to add a team photo.</p>
+                  </div>
+                </div>
+
+                {teamError && <p className="profile-page__error">{teamError}</p>}
+
+                <button
+                  type="submit"
+                  className="profile-page__save-btn profile-page__save-btn--full"
+                  disabled={teamLoading || !teamName.trim()}
+                >
+                  {teamLoading ? 'Creating…' : 'Create Team'}
+                </button>
+              </form>
+            )}
+
+            {team && (
+              <div className="profile-page__team-display">
+                {team.photoUrl && (
+                  <img className="profile-page__avatar-img" src={team.photoUrl} alt={team.name} />
+                )}
+                <p className="profile-page__team-name">{team.name}</p>
+                <div className="profile-page__team-code-block">
+                  <span className="profile-page__label">Team Code</span>
+                  <span className="profile-page__team-code">{team.teamCode}</span>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
 
       </div>
     </div>

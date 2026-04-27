@@ -319,6 +319,46 @@
 .profile-page__coach-desc {
   font-family: var(--font-body);
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   line-height: 1.5;
+}
+
+/* ── Team ──────────────────────────────────── */
+.profile-page__team-photo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.profile-page__team-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.profile-page__team-name {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.profile-page__team-code-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.profile-page__team-code {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+  background: rgba(56, 182, 255, 0.12);
+  border-radius: var(--radius-pill);
+  padding: var(--space-sm) var(--space-lg);
 }
