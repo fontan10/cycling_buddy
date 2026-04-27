@@ -30,6 +30,36 @@ router.get('/mine', requireAuth, async (req: AuthRequest, res: Response): Promis
   res.json({ team: membership.teamId, membership });
 });
 
+// Join a team by code (enforces single-team restriction per US-12)
+router.post('/join', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const existing = await TeamMembership.findOne({ userId: req.userId, leftAt: null });
+  if (existing) {
+    res.status(409).json({ error: 'You are already on a team. Leave your current team before joining another.' });
+    return;
+  }
+
+  const { teamCode } = req.body;
+  if (!teamCode?.trim()) {
+    res.status(400).json({ error: 'Team code is required' });
+    return;
+  }
+
+  const team = await Team.findOne({ teamCode: teamCode.trim().toUpperCase() });
+  if (!team) {
+    res.status(404).json({ error: 'No team found with that code' });
+    return;
+  }
+
+  const membership = await TeamMembership.create({
+    userId:   req.userId,
+    teamId:   team._id,
+    role:     'member',
+    joinedAt: new Date(),
+  });
+
+  res.status(201).json({ team, membership });
+});
+
 // Create a new team (coach only, one active team per coach)
 router.post('/', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   const user = await User.findById(req.userId).lean();
