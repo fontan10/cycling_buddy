@@ -17,6 +17,7 @@ export interface User {
   googleId?: string
   firstName?: string
   lastName?: string
+  isCoach?: boolean
 }
 
 interface AuthState {

@@ -40,6 +40,30 @@ router.put('/avatar', requireAuth, async (req: AuthRequest, res: Response): Prom
   res.json({ user });
 });
 
+// Opt into the coach role — unlocks team creation
+router.post('/become-coach', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const user = await User.findByIdAndUpdate(
+    req.userId,
+    { isCoach: true },
+    { new: true },
+  ).select('-passwordHash');
+
+  if (!user) { res.status(404).json({ error: 'User not found' }); return; }
+  res.json({ user });
+});
+
+// Resign from the coach role
+router.post('/resign-coach', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const user = await User.findByIdAndUpdate(
+    req.userId,
+    { isCoach: false },
+    { new: true },
+  ).select('-passwordHash');
+
+  if (!user) { res.status(404).json({ error: 'User not found' }); return; }
+  res.json({ user });
+});
+
 // Change password (not available for Google-only accounts)
 router.put('/password', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   const { currentPassword, newPassword } = req.body;
