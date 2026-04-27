@@ -190,6 +190,25 @@
   text-transform: uppercase;
 }
 
+.auth-page__label-hint {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.auth-page__required {
+  color: var(--color-danger);
+}
+
+.auth-page__optional {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
 .auth-page__input-wrap {
   display: flex;
   align-items: center;
@@ -267,6 +286,63 @@
 .auth-page__submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* ── Username Suggestion ─────────────────────── */
+.auth-page__username-display {
+  flex: 1;
+  padding: 13px 0;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+}
+
+.auth-page__username-display--loading {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.auth-page__username-refresh {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-circle);
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-shadow: 0 3px 0 rgba(44, 62, 107, 0.25);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+
+@media (hover: hover) {
+  .auth-page__username-refresh:hover {
+    background: #1A9FEF;
+  }
+}
+
+.auth-page__username-refresh:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(44, 62, 107, 0.25);
+}
+
+.auth-page__username-refresh:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@keyframes auth-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.auth-page__username-refresh--spinning svg {
+  animation: auth-spin 0.35s ease;
 }
 
 /* ── Tip ────────────────────────────────────── */

@@ -2,14 +2,16 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { BottomNav } from '../../components/BottomNav'
+import { useUsernameSuggestions, RefreshIcon } from '../../hooks/useUsernameSuggestions'
 import './AuthPage.css'
 
 type Tab = 'join' | 'login'
 
 export function AuthPage() {
   const [tab, setTab] = useState<Tab>('join')
-  const [displayName, setDisplayName] = useState('')
+  const { username, isSpinning, isFetching, refreshError, refresh } = useUsernameSuggestions()
   const [email, setEmail] = useState('')
+  const [loginField, setLoginField] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -23,9 +25,9 @@ export function AuthPage() {
     setIsLoading(true)
     try {
       if (tab === 'join') {
-        await register(email, password, displayName || undefined)
+        await register(username, password, email || undefined)
       } else {
-        await login(email, password)
+        await login(loginField, password)
       }
       navigate('/')
     } catch (err: unknown) {
@@ -96,48 +98,79 @@ export function AuthPage() {
 
         {/* Form */}
         <form className="auth-page__form" onSubmit={handleSubmit} noValidate>
-          {tab === 'join' && (
+          {tab === 'join' ? (
+            <>
+              <div className="auth-page__field">
+                <label className="auth-page__label">
+                  Username <span className="auth-page__required" aria-hidden="true">*</span>
+                  <span className="auth-page__label-hint"> · seen by all riders</span>
+                </label>
+                <div className="auth-page__input-wrap">
+                  <span className="auth-page__input-icon">
+                    <BikeIcon />
+                  </span>
+                  <span
+                    className={`auth-page__username-display${isFetching ? ' auth-page__username-display--loading' : ''}`}
+                    aria-live="polite"
+                    aria-label={isFetching ? 'Finding a username…' : `Suggested username: ${username}`}
+                  >
+                    {isFetching ? 'Finding your name…' : username}
+                  </span>
+                  <button
+                    type="button"
+                    className={`auth-page__username-refresh${isSpinning ? ' auth-page__username-refresh--spinning' : ''}`}
+                    onClick={refresh}
+                    disabled={isFetching}
+                    aria-label="Get a new username suggestion"
+                  >
+                    <RefreshIcon />
+                  </button>
+                </div>
+                {refreshError && <p className="auth-page__error">Couldn't get a new name — try again</p>}
+              </div>
+
+              <div className="auth-page__field">
+                <label className="auth-page__label" htmlFor="email">
+                  Email <span className="auth-page__label-hint">(optional)</span>
+                </label>
+                <div className="auth-page__input-wrap">
+                  <span className="auth-page__input-icon">
+                    <MailIcon />
+                  </span>
+                  <input
+                    id="email"
+                    className="auth-page__input"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
             <div className="auth-page__field">
-              <label className="auth-page__label" htmlFor="displayName">
-                Rider Name
+              <label className="auth-page__label" htmlFor="loginField">
+                Username or Email
               </label>
               <div className="auth-page__input-wrap">
                 <span className="auth-page__input-icon">
-                  <BikeIcon />
+                  <MailIcon />
                 </span>
                 <input
-                  id="displayName"
+                  id="loginField"
                   className="auth-page__input"
                   type="text"
-                  placeholder="CoolestRiderEver"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  autoComplete="nickname"
+                  placeholder="coolrider42 or you@example.com"
+                  value={loginField}
+                  onChange={(e) => setLoginField(e.target.value)}
+                  required
+                  autoComplete="username"
                 />
               </div>
             </div>
           )}
-
-          <div className="auth-page__field">
-            <label className="auth-page__label" htmlFor="email">
-              Email
-            </label>
-            <div className="auth-page__input-wrap">
-              <span className="auth-page__input-icon">
-                <MailIcon />
-              </span>
-              <input
-                id="email"
-                className="auth-page__input"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </div>
-          </div>
 
           <div className="auth-page__field">
             <label className="auth-page__label" htmlFor="password">
@@ -165,7 +198,7 @@ export function AuthPage() {
           <button
             className="auth-page__submit"
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || (tab === 'join' && isFetching)}
           >
             {isLoading
               ? 'Loading...'
@@ -182,7 +215,7 @@ export function AuthPage() {
               <BikeIcon />
             </span>
             <p className="auth-page__tip-text">
-              Pick a strong secret code — your fellow cyclists are counting on you!
+              Your username is visible to all riders on the map — tap the blue button to get a new one!
             </p>
           </div>
         )}
@@ -233,3 +266,4 @@ function LockIcon() {
     </svg>
   )
 }
+

@@ -6,6 +6,7 @@ import { ReportPage } from './pages/ReportPage'
 import { SuccessPage } from './pages/SuccessPage'
 import { AuthCallbackPage } from './pages/AuthCallbackPage'
 import { AuthPage } from './pages/AuthPage'
+import { GoogleSetupPage } from './pages/GoogleSetupPage'
 import { PageTransition } from './components/PageTransition'
 
 function AnimatedRoutes() {
@@ -19,6 +20,7 @@ function AnimatedRoutes() {
         <Route path="/report/:categoryId" element={<PageTransition><ReportPage /></PageTransition>} />
         <Route path="/success" element={<PageTransition><SuccessPage /></PageTransition>} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/auth/google-setup" element={<GoogleSetupPage />} />
         <Route path="/auth" element={<AuthPage />} />
       </Routes>
     </AnimatePresence>

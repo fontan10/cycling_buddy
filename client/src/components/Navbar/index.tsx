@@ -132,7 +132,7 @@ export function Navbar() {
             <img
               className="navbar__avatar"
               src={user.avatarUrl}
-              alt={user.displayName || 'Profile'}
+              alt={user.username || 'Profile'}
             />
           ) : (
             <svg

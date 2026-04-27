@@ -11,16 +11,16 @@ import { apiFetch, BASE } from '../lib/api'
 
 export interface User {
   _id: string
-  email: string
-  displayName: string
-  avatarUrl: string
+  username: string
+  email?: string
+  avatarUrl?: string
 }
 
 interface AuthState {
   user: User | null
   isLoading: boolean
-  login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, displayName?: string) => Promise<void>
+  login: (login: string, password: string) => Promise<void>
+  register: (username: string, password: string, email?: string) => Promise<void>
   logout: () => void
   loginWithGoogle: () => void
   handleOAuthCallback: (token: string) => Promise<void>
@@ -61,10 +61,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const login = useCallback(
-    async (email: string, password: string) => {
+    async (login: string, password: string) => {
       const { token } = await apiFetch<{ token: string }>('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ login, password }),
       })
       await saveTokenAndFetch(token)
     },
@@ -72,10 +72,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const register = useCallback(
-    async (email: string, password: string, displayName?: string) => {
+    async (username: string, password: string, email?: string) => {
       const { token } = await apiFetch<{ token: string }>('/auth/register', {
         method: 'POST',
-        body: JSON.stringify({ email, password, displayName }),
+        body: JSON.stringify({ username, password, email }),
       })
       await saveTokenAndFetch(token)
     },
