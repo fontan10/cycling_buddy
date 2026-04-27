@@ -7,6 +7,7 @@ const userSchema = new Schema(
     avatarUrl:    { type: String },
     passwordHash: { type: String },
     googleId:     { type: String, unique: true, sparse: true },
+    isCoach:      { type: Boolean, default: false },
   },
   { timestamps: true },
 );
