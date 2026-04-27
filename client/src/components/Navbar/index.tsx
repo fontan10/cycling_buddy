@@ -110,7 +110,17 @@ export function Navbar() {
       logout()
       setSigningOut(false)
       setOpen(false)
+      navigate('/')
     }, 900)
+  }
+
+  function handleAccountClick() {
+    if (user) {
+      navigate('/profile')
+    } else {
+      navigate('/auth')
+    }
+    setOpen(false)
   }
 
   return (
@@ -163,66 +173,70 @@ export function Navbar() {
             >
               <li role="none">
                 <button
-                  className={`navbar__menu-item${signingOut ? ' navbar__menu-item--success' : ''}`}
-                  role="menuitem"
-                  disabled={signingOut}
-                  onClick={() => { if (user) handleSignOut(); else { navigate('/auth'); setOpen(false) } }}
-                >
-                  <AnimatePresence mode="wait" initial={false}>
-                    {signingOut ? (
-                      <motion.span
-                        key="check"
-                        className="navbar__menu-item-icon"
-                        initial={{ scale: 0, rotate: -45 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                      >
-                        {checkIcon}
-                      </motion.span>
-                    ) : (
-                      <motion.span
-                        key="signout"
-                        className="navbar__menu-item-icon"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                      >
-                        {user ? signOutIcon : accountIcon}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                  <AnimatePresence mode="wait" initial={false}>
-                    {signingOut ? (
-                      <motion.span
-                        key="label-success"
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        Signed out!
-                      </motion.span>
-                    ) : (
-                      <motion.span
-                        key="label-default"
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        {user ? 'Sign Out' : 'Account'}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </button>
-              </li>
-              <li role="none">
-                <button
                   className="navbar__menu-item"
                   role="menuitem"
-                  onClick={() => setOpen(false)}
+                  onClick={handleAccountClick}
                 >
-                  {settingsIcon}
-                  Settings
+                  <span className="navbar__menu-item-icon">
+                    {user ? settingsIcon : accountIcon}
+                  </span>
+                  Account
                 </button>
               </li>
+              {user && (
+                <li role="none">
+                  <button
+                    className={`navbar__menu-item${signingOut ? ' navbar__menu-item--success' : ''}`}
+                    role="menuitem"
+                    disabled={signingOut}
+                    onClick={handleSignOut}
+                  >
+                    <AnimatePresence mode="wait" initial={false}>
+                      {signingOut ? (
+                        <motion.span
+                          key="check"
+                          className="navbar__menu-item-icon"
+                          initial={{ scale: 0, rotate: -45 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                        >
+                          {checkIcon}
+                        </motion.span>
+                      ) : (
+                        <motion.span
+                          key="signout"
+                          className="navbar__menu-item-icon"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                        >
+                          {signOutIcon}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence mode="wait" initial={false}>
+                      {signingOut ? (
+                        <motion.span
+                          key="label-success"
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.15 }}
+                        >
+                          Signed out!
+                        </motion.span>
+                      ) : (
+                        <motion.span
+                          key="label-default"
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.15 }}
+                        >
+                          Sign Out
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </button>
+                </li>
+              )}
             </motion.ul>
           )}
         </AnimatePresence>

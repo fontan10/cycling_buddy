@@ -1,0 +1,285 @@
+.profile-page {
+  min-height: 100svh;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-app);
+}
+
+.profile-page__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+}
+
+/* ── Header ────────────────────────────────── */
+.profile-page__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding-top: var(--space-sm);
+}
+
+.profile-page__back {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-circle);
+  background: var(--surface-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-ambient);
+  transition: background 150ms ease, color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) {
+  .profile-page__back:hover {
+    background: var(--color-primary);
+    color: var(--text-on-primary);
+  }
+}
+
+.profile-page__back:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.profile-page__header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.profile-page__greeting {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.profile-page__title {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Card ──────────────────────────────────── */
+.profile-page__card {
+  background: var(--surface-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.profile-page__section-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Avatar ────────────────────────────────── */
+.profile-page__avatar-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.profile-page__avatar-wrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+}
+
+.profile-page__avatar-img {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-circle);
+  object-fit: cover;
+  display: block;
+}
+
+.profile-page__avatar-placeholder {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-circle);
+  background: var(--surface-cell);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.profile-page__avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-circle);
+  background: rgba(44, 62, 107, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.profile-page__avatar-wrap:hover .profile-page__avatar-overlay,
+.profile-page__avatar-wrap:focus-within .profile-page__avatar-overlay {
+  opacity: 1;
+}
+
+/* Always show the overlay on touch devices so it's discoverable */
+@media (hover: none) {
+  .profile-page__avatar-overlay {
+    opacity: 0.7;
+  }
+}
+
+.profile-page__file-input {
+  display: none;
+}
+
+.profile-page__avatar-hint {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ── Form fields ───────────────────────────── */
+.profile-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.profile-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profile-page__label {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.profile-page__input-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--surface-cell);
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-md);
+  border: 2px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.profile-page__input-wrap:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(56, 182, 255, 0.15);
+  background: var(--surface-container-lowest);
+}
+
+.profile-page__input-icon {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.profile-page__input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 13px 0;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  min-height: 44px;
+}
+
+.profile-page__input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Error ──────────────────────────────────── */
+.profile-page__error {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-danger);
+  background: rgba(231, 76, 60, 0.08);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  text-align: center;
+}
+
+/* ── Save Button ───────────────────────────── */
+.profile-page__save-btn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 0 rgba(44, 62, 107, 0.25);
+  transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) {
+  .profile-page__save-btn:hover:not(:disabled) {
+    background: #1A9FEF;
+  }
+}
+
+.profile-page__save-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(44, 62, 107, 0.25);
+}
+
+.profile-page__save-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.profile-page__save-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Avatar form — full-width save button */
+.profile-page__avatar-form .profile-page__save-btn {
+  align-self: stretch;
+}

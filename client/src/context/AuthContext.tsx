@@ -14,6 +14,9 @@ export interface User {
   username: string
   email?: string
   avatarUrl?: string
+  googleId?: string
+  firstName?: string
+  lastName?: string
 }
 
 interface AuthState {
@@ -24,6 +27,7 @@ interface AuthState {
   logout: () => void
   loginWithGoogle: () => void
   handleOAuthCallback: (token: string) => Promise<void>
+  updateUser: (patch: Partial<User>) => void
 }
 
 const AuthContext = createContext<AuthState | null>(null)
@@ -98,9 +102,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [saveTokenAndFetch],
   )
 
+  const updateUser = useCallback((patch: Partial<User>) => {
+    setUser(prev => prev ? { ...prev, ...patch } : prev)
+  }, [])
+
   const value = useMemo(
-    () => ({ user, isLoading, login, register, logout, loginWithGoogle, handleOAuthCallback }),
-    [user, isLoading, login, register, logout, loginWithGoogle, handleOAuthCallback],
+    () => ({ user, isLoading, login, register, logout, loginWithGoogle, handleOAuthCallback, updateUser }),
+    [user, isLoading, login, register, logout, loginWithGoogle, handleOAuthCallback, updateUser],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

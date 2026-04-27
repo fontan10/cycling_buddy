@@ -215,14 +215,19 @@ router.post('/google/complete', async (req: Request, res: Response): Promise<voi
   res.status(201).json({ token: signToken(String(user._id)) });
 });
 
-// Get current user
+// Get current user (includes firstName/lastName from UserProfile)
 router.get('/me', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
-  const user = await User.findById(req.userId).select('-passwordHash');
+  const user = await User.findById(req.userId).select('-passwordHash').lean();
   if (!user) {
     res.status(404).json({ error: 'User not found' });
     return;
   }
-  res.json(user);
+  const profile = await UserProfile.findOne({ userId: req.userId }).lean();
+  res.json({
+    ...user,
+    firstName: profile?.firstName ?? '',
+    lastName:  profile?.lastName  ?? '',
+  });
 });
 
 export default router;
