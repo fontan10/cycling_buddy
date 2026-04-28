@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { AccountIcon, CheckIcon, CyclingBuddyLogo, PersonIcon, SettingsIcon, SignOutIcon } from '../Icons'
+import { AccountIcon, CheckIcon, CyclingBuddyLogo, GroupIcon, PersonIcon, SettingsIcon, SignOutIcon } from '../Icons'
 import './Navbar.css'
 
 
@@ -40,6 +40,11 @@ export function Navbar() {
     } else {
       navigate('/auth')
     }
+    setOpen(false)
+  }
+
+  function handleTeamClick() {
+    navigate('/team')
     setOpen(false)
   }
 
@@ -91,6 +96,18 @@ export function Navbar() {
                   Account
                 </button>
               </li>
+              {user && (
+                <li role="none">
+                  <button
+                    className="navbar__menu-item"
+                    role="menuitem"
+                    onClick={handleTeamClick}
+                  >
+                    <span className="navbar__menu-item-icon"><GroupIcon /></span>
+                    My Team
+                  </button>
+                </li>
+              )}
               {user && (
                 <li role="none">
                   <button

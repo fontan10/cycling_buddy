@@ -26,3 +26,14 @@ export interface Team {
   teamCode: string
   createdAt: string
 }
+
+export interface TeamMember {
+  _id: string
+  role: 'coach' | 'member'
+  joinedAt: string
+  user: {
+    _id: string
+    username: string
+    avatarUrl?: string
+  }
+}

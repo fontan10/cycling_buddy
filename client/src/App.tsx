@@ -8,6 +8,7 @@ import { AuthCallbackPage } from './pages/AuthCallbackPage'
 import { AuthPage } from './pages/AuthPage'
 import { GoogleSetupPage } from './pages/GoogleSetupPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { TeamPage } from './pages/TeamPage'
 import { PageTransition } from './components/PageTransition'
 
 function AnimatedRoutes() {
@@ -24,6 +25,7 @@ function AnimatedRoutes() {
         <Route path="/auth/google-setup" element={<GoogleSetupPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/profile" element={<PageTransition><ProfilePage /></PageTransition>} />
+        <Route path="/team" element={<PageTransition><TeamPage /></PageTransition>} />
       </Routes>
     </AnimatePresence>
   )

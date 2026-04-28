@@ -73,6 +73,32 @@ router.post('/regenerate-code', requireAuth, async (req: AuthRequest, res: Respo
   res.json({ team });
 });
 
+// List all active members of the authenticated user's team
+router.get('/mine/members', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const membership = await TeamMembership.findOne({ userId: req.userId, leftAt: null })
+    .populate('teamId')
+    .lean();
+
+  if (!membership) {
+    res.json({ team: null, members: [] });
+    return;
+  }
+
+  const memberships = await TeamMembership.find({ teamId: (membership.teamId as any)._id, leftAt: null })
+    .populate('userId', 'username avatarUrl')
+    .sort({ joinedAt: 1 })
+    .lean();
+
+  const members = memberships.map(m => ({
+    _id: m._id,
+    role: m.role,
+    joinedAt: m.joinedAt,
+    user: m.userId,
+  }));
+
+  res.json({ team: membership.teamId, members });
+});
+
 // Create a new team (coach only, one active team per coach)
 router.post('/', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   const user = await User.findById(req.userId).lean();
