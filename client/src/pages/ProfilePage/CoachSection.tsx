@@ -4,7 +4,6 @@ import type { User } from '../../context/AuthContext'
 import { apiFetch } from '../../lib/api'
 import { ShieldIcon } from '../../components/Icons'
 
-// TODO: do not allow a user to resign as coach if they are the sole coach of a team
 
 export function CoachSection() {
   const { user, updateUser } = useAuth()

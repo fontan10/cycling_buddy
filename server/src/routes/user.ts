@@ -61,6 +61,20 @@ router.post('/become-coach', requireAuth, async (req: AuthRequest, res: Response
 
 // Resign from the coach role
 router.post('/resign-coach', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const coachMemberships = await TeamMembership.find({ userId: req.userId, role: 'coach', leftAt: null });
+  for (const membership of coachMemberships) {
+    const otherCoachCount = await TeamMembership.countDocuments({
+      teamId: membership.teamId,
+      role: 'coach',
+      leftAt: null,
+      userId: { $ne: req.userId },
+    });
+    if (otherCoachCount === 0) {
+      res.status(409).json({ error: 'You are the sole coach of a team. Promote another member to coach before resigning.' });
+      return;
+    }
+  }
+
   const user = await User.findByIdAndUpdate(
     req.userId,
     { isCoach: false },
