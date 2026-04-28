@@ -369,3 +369,33 @@
   border-radius: var(--radius-pill);
   padding: var(--space-sm) var(--space-lg);
 }
+
+.profile-page__regen-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--surface-cell);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) {
+  .profile-page__regen-btn:hover:not(:disabled) {
+    color: var(--text-primary);
+  }
+}
+
+.profile-page__regen-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

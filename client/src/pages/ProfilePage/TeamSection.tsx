@@ -18,6 +18,8 @@ export function TeamSection() {
   const [joinCode, setJoinCode] = useState('')
   const [joinLoading, setJoinLoading] = useState(false)
   const [joinError, setJoinError] = useState('')
+  const [regenLoading, setRegenLoading] = useState(false)
+  const [regenError, setRegenError] = useState('')
 
   useEffect(() => {
     if (!user) return
@@ -58,6 +60,19 @@ export function TeamSection() {
       setTeamError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setTeamLoading(false)
+    }
+  }
+
+  async function handleRegenCode() {
+    setRegenError('')
+    setRegenLoading(true)
+    try {
+      const { team: updated } = await apiFetch<{ team: Team }>('/teams/regenerate-code', { method: 'POST' })
+      setTeam(updated)
+    } catch (err) {
+      setRegenError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setRegenLoading(false)
     }
   }
 
@@ -173,6 +188,14 @@ export function TeamSection() {
             <div className="profile-page__team-code-block">
               <span className="profile-page__label">Team Code</span>
               <span className="profile-page__team-code">{team.teamCode}</span>
+              <button
+                className="profile-page__regen-btn"
+                onClick={handleRegenCode}
+                disabled={regenLoading}
+              >
+                {regenLoading ? 'Regenerating…' : 'Regenerate Code'}
+              </button>
+              {regenError && <p className="profile-page__error">{regenError}</p>}
             </div>
           )}
         </div>

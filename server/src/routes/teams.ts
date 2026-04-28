@@ -60,6 +60,19 @@ router.post('/join', requireAuth, async (req: AuthRequest, res: Response): Promi
   res.status(201).json({ team, membership });
 });
 
+// Regenerate the team code, revoking the previous one (coach only)
+router.post('/regenerate-code', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const membership = await TeamMembership.findOne({ userId: req.userId, role: 'coach', leftAt: null });
+  if (!membership) {
+    res.status(403).json({ error: 'Only coaches with an active team can regenerate the team code' });
+    return;
+  }
+
+  const teamCode = await generateUniqueCode();
+  const team = await Team.findByIdAndUpdate(membership.teamId, { teamCode }, { new: true });
+  res.json({ team });
+});
+
 // Create a new team (coach only, one active team per coach)
 router.post('/', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   const user = await User.findById(req.userId).lean();
