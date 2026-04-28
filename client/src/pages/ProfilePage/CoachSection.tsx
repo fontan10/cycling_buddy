@@ -4,7 +4,6 @@ import type { User } from '../../context/AuthContext'
 import { apiFetch } from '../../lib/api'
 import { ShieldIcon } from '../../components/Icons'
 
-
 export function CoachSection() {
   const { user, updateUser } = useAuth()
 
@@ -12,6 +11,7 @@ export function CoachSection() {
   const [error, setError] = useState('')
   const [isOnTeam, setIsOnTeam] = useState<boolean | null>(null)
 
+  // Re-run when isCoach changes so we have fresh membership state after a resign
   useEffect(() => {
     if (user?.isCoach) return
     apiFetch<{ membership: unknown }>('/teams/mine')

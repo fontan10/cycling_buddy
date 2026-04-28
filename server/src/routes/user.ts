@@ -43,8 +43,8 @@ router.put('/avatar', requireAuth, async (req: AuthRequest, res: Response): Prom
 
 // Opt into the coach role — unlocks team creation
 router.post('/become-coach', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
-  const activeMembership = await TeamMembership.findOne({ userId: req.userId, leftAt: null });
-  if (activeMembership) {
+  const isMember = await TeamMembership.exists({ userId: req.userId, leftAt: null });
+  if (isMember) {
     res.status(409).json({ error: 'You cannot become a coach while you are a member of a team.' });
     return;
   }
@@ -62,17 +62,14 @@ router.post('/become-coach', requireAuth, async (req: AuthRequest, res: Response
 // Resign from the coach role
 router.post('/resign-coach', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   const coachMemberships = await TeamMembership.find({ userId: req.userId, role: 'coach', leftAt: null });
-  for (const membership of coachMemberships) {
-    const otherCoachCount = await TeamMembership.countDocuments({
-      teamId: membership.teamId,
-      role: 'coach',
-      leftAt: null,
-      userId: { $ne: req.userId },
-    });
-    if (otherCoachCount === 0) {
-      res.status(409).json({ error: 'You are the sole coach of a team. Promote another member to coach before resigning.' });
-      return;
-    }
+  const otherCounts = await Promise.all(
+    coachMemberships.map(m =>
+      TeamMembership.countDocuments({ teamId: m.teamId, role: 'coach', leftAt: null, userId: { $ne: req.userId } })
+    )
+  );
+  if (otherCounts.some(c => c === 0)) {
+    res.status(409).json({ error: 'You are the sole coach of your team. Promote another member to coach before resigning.' });
+    return;
   }
 
   const user = await User.findByIdAndUpdate(
