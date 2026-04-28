@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { apiFetch } from '../../lib/api'
-import { useUsernameSuggestions, RefreshIcon } from '../../hooks/useUsernameSuggestions'
+import { useUsernameSuggestions } from '../../hooks/useUsernameSuggestions'
+import { BikeIcon, RefreshIcon } from '../../components/Icons'
 import '../AuthPage/AuthPage.css'
 
 export function GoogleSetupPage() {
@@ -139,15 +140,5 @@ export function GoogleSetupPage() {
   )
 }
 
-function BikeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="5.5" cy="17.5" r="3.5" />
-      <circle cx="18.5" cy="17.5" r="3.5" />
-      <path d="M15 6h-5l-2 7h9l-2-7z" />
-      <path d="M5.5 17.5L9 9" />
-      <path d="M15 6l3.5 11.5" />
-    </svg>
-  )
-}
+
 
