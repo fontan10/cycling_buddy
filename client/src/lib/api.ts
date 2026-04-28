@@ -1,5 +1,11 @@
 export const BASE = (import.meta.env.VITE_API_URL ?? '') + '/api'
 
+export type ApiError = Error & { field?: string }
+
+export function isApiError(err: unknown): err is ApiError {
+  return err instanceof Error
+}
+
 function getToken() {
   return localStorage.getItem('token')
 }
@@ -18,7 +24,9 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
-    throw new Error(body.error ?? `Request failed: ${res.status}`)
+    const err = new Error(body.error ?? `Request failed: ${res.status}`) as ApiError
+    err.field = body.field
+    throw err
   }
 
   return res.json()

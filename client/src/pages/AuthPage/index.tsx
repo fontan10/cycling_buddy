@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { isApiError } from '../../lib/api'
 import { BottomNav } from '../../components/BottomNav'
 import { useUsernameSuggestions, RefreshIcon } from '../../hooks/useUsernameSuggestions'
 import './AuthPage.css'
@@ -11,6 +12,8 @@ export function AuthPage() {
   const [tab, setTab] = useState<Tab>('join')
   const { username, isSpinning, isFetching, refreshError, refresh } = useUsernameSuggestions()
   const [email, setEmail] = useState('')
+  const [teamCode, setTeamCode] = useState('')
+  const [teamCodeError, setTeamCodeError] = useState('')
   const [loginField, setLoginField] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -22,16 +25,21 @@ export function AuthPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setTeamCodeError('')
     setIsLoading(true)
     try {
       if (tab === 'join') {
-        await register(username, password, email || undefined)
+        await register(username, password, email || undefined, teamCode || undefined)
       } else {
         await login(loginField, password)
       }
       navigate('/')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      if (isApiError(err) && err.field === 'teamCode') {
+        setTeamCodeError(err.message)
+      } else {
+        setError(isApiError(err) ? err.message : 'Something went wrong')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -69,7 +77,7 @@ export function AuthPage() {
             role="tab"
             aria-selected={tab === 'join'}
             className={`auth-page__tab ${tab === 'join' ? 'auth-page__tab--active' : ''}`}
-            onClick={() => { setTab('join'); setError('') }}
+            onClick={() => { setTab('join'); setError(''); setTeamCodeError('') }}
           >
             Join
           </button>
@@ -77,7 +85,7 @@ export function AuthPage() {
             role="tab"
             aria-selected={tab === 'login'}
             className={`auth-page__tab ${tab === 'login' ? 'auth-page__tab--active' : ''}`}
-            onClick={() => { setTab('login'); setError('') }}
+            onClick={() => { setTab('login'); setError(''); setTeamCodeError('') }}
           >
             Login
           </button>
@@ -147,6 +155,32 @@ export function AuthPage() {
                     autoComplete="email"
                   />
                 </div>
+              </div>
+
+              <div className="auth-page__field">
+                <label className="auth-page__label" htmlFor="teamCode">
+                  Team Code <span className="auth-page__label-hint">(optional)</span>
+                </label>
+                <div className="auth-page__input-wrap">
+                  <span className="auth-page__input-icon">
+                    <GroupIcon />
+                  </span>
+                  <input
+                    id="teamCode"
+                    className="auth-page__input"
+                    type="text"
+                    placeholder="e.g. AB12CD"
+                    value={teamCode}
+                    onChange={(e) => {
+                      setTeamCode(e.target.value.toUpperCase())
+                      setTeamCodeError('')
+                    }}
+                    maxLength={6}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                </div>
+                {teamCodeError && <p className="auth-page__error">{teamCodeError}</p>}
               </div>
             </>
           ) : (
@@ -263,6 +297,17 @@ function LockIcon() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  )
+}
+
+function GroupIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </svg>
   )
 }
