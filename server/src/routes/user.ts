@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { User } from '../models/User';
 import { UserProfile } from '../models/UserProfile';
+import { TeamMembership } from '../models/TeamMembership';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
@@ -42,6 +43,12 @@ router.put('/avatar', requireAuth, async (req: AuthRequest, res: Response): Prom
 
 // Opt into the coach role — unlocks team creation
 router.post('/become-coach', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const activeMembership = await TeamMembership.findOne({ userId: req.userId, leftAt: null });
+  if (activeMembership) {
+    res.status(409).json({ error: 'You cannot become a coach while you are a member of a team.' });
+    return;
+  }
+
   const user = await User.findByIdAndUpdate(
     req.userId,
     { isCoach: true },

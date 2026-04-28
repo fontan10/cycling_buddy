@@ -1,14 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import type { User } from '../../context/AuthContext'
 import { apiFetch } from '../../lib/api'
 import { ShieldIcon } from '../../components/Icons'
+
+// TODO: do not allow a user to resign as coach if they are the sole coach of a team
 
 export function CoachSection() {
   const { user, updateUser } = useAuth()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isOnTeam, setIsOnTeam] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    if (user?.isCoach) return
+    apiFetch<{ membership: unknown }>('/teams/mine')
+      .then(({ membership }) => setIsOnTeam(membership !== null))
+      .catch(() => setIsOnTeam(false))
+  }, [user?.isCoach])
 
   async function handleBecomeCoach() {
     setError('')
@@ -53,6 +63,10 @@ export function CoachSection() {
             {loading ? 'Saving…' : 'Resign as Coach'}
           </button>
         </>
+      ) : isOnTeam ? (
+        <p className="profile-page__coach-desc">
+          You cannot become a coach while you are a member of a team. Leave your team first, or ask a coach to promote you.
+        </p>
       ) : (
         <>
           <p className="profile-page__coach-desc">
@@ -61,7 +75,7 @@ export function CoachSection() {
           {error && <p className="profile-page__error">{error}</p>}
           <button
             className="profile-page__save-btn profile-page__save-btn--full"
-            disabled={loading}
+            disabled={loading || isOnTeam === null}
             onClick={handleBecomeCoach}
           >
             {loading ? 'Saving…' : 'Become a Coach'}
