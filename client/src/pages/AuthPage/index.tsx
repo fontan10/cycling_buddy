@@ -4,7 +4,9 @@ import { useAuth } from '../../context/AuthContext'
 import { isApiError } from '../../lib/api'
 import { BottomNav } from '../../components/BottomNav'
 import { useUsernameSuggestions } from '../../hooks/useUsernameSuggestions'
-import { BikeIcon, CloseIcon, GoogleIcon, GroupIcon, LockIcon, MailIcon, RefreshIcon } from '../../components/Icons'
+import { BikeIcon, CloseIcon, GoogleIcon, LockIcon, MailIcon } from '../../components/Icons'
+import { UsernameField } from './UsernameField'
+import { TeamCodeField } from './TeamCodeField'
 import './AuthPage.css'
 
 type Tab = 'join' | 'login'
@@ -106,34 +108,13 @@ export function AuthPage() {
         <form className="auth-page__form" onSubmit={handleSubmit} noValidate>
           {tab === 'join' ? (
             <>
-              <div className="auth-page__field">
-                <label className="auth-page__label">
-                  Username <span className="auth-page__required" aria-hidden="true">*</span>
-                  <span className="auth-page__label-hint"> · seen by all riders</span>
-                </label>
-                <div className="auth-page__input-wrap">
-                  <span className="auth-page__input-icon">
-                    <BikeIcon />
-                  </span>
-                  <span
-                    className={`auth-page__username-display${isFetching ? ' auth-page__username-display--loading' : ''}`}
-                    aria-live="polite"
-                    aria-label={isFetching ? 'Finding a username…' : `Suggested username: ${username}`}
-                  >
-                    {isFetching ? 'Finding your name…' : username}
-                  </span>
-                  <button
-                    type="button"
-                    className={`auth-page__username-refresh${isSpinning ? ' auth-page__username-refresh--spinning' : ''}`}
-                    onClick={refresh}
-                    disabled={isFetching}
-                    aria-label="Get a new username suggestion"
-                  >
-                    <RefreshIcon />
-                  </button>
-                </div>
-                {refreshError && <p className="auth-page__error">Couldn't get a new name — try again</p>}
-              </div>
+              <UsernameField
+                username={username}
+                isSpinning={isSpinning}
+                isFetching={isFetching}
+                refresh={refresh}
+                refreshError={refreshError}
+              />
 
               <div className="auth-page__field">
                 <label className="auth-page__label" htmlFor="email">
@@ -155,31 +136,11 @@ export function AuthPage() {
                 </div>
               </div>
 
-              <div className="auth-page__field">
-                <label className="auth-page__label" htmlFor="teamCode">
-                  Team Code <span className="auth-page__label-hint">(optional)</span>
-                </label>
-                <div className="auth-page__input-wrap">
-                  <span className="auth-page__input-icon">
-                    <GroupIcon />
-                  </span>
-                  <input
-                    id="teamCode"
-                    className="auth-page__input"
-                    type="text"
-                    placeholder="e.g. AB12CD"
-                    value={teamCode}
-                    onChange={(e) => {
-                      setTeamCode(e.target.value.toUpperCase())
-                      setTeamCodeError('')
-                    }}
-                    maxLength={6}
-                    autoComplete="off"
-                    spellCheck={false}
-                  />
-                </div>
-                {teamCodeError && <p className="auth-page__error">{teamCodeError}</p>}
-              </div>
+              <TeamCodeField
+                value={teamCode}
+                onChange={(v) => { setTeamCode(v); setTeamCodeError('') }}
+                error={teamCodeError}
+              />
             </>
           ) : (
             <div className="auth-page__field">

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { apiFetch } from '../../lib/api'
+import { apiFetch, isApiError } from '../../lib/api'
 import { useUsernameSuggestions } from '../../hooks/useUsernameSuggestions'
-import { BikeIcon, RefreshIcon } from '../../components/Icons'
+import { BikeIcon } from '../../components/Icons'
+import { UsernameField } from '../AuthPage/UsernameField'
+import { TeamCodeField } from '../AuthPage/TeamCodeField'
 import '../AuthPage/AuthPage.css'
 
 export function GoogleSetupPage() {
@@ -14,6 +16,8 @@ export function GoogleSetupPage() {
   const { username, isSpinning, isFetching, refreshError, refresh } = useUsernameSuggestions()
   const [firstName, setFirstName] = useState(params.get('firstName') ?? '')
   const [lastName, setLastName] = useState(params.get('lastName') ?? '')
+  const [teamCode, setTeamCode] = useState('')
+  const [teamCodeError, setTeamCodeError] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -26,16 +30,21 @@ export function GoogleSetupPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setTeamCodeError('')
     setIsLoading(true)
     try {
       const { token } = await apiFetch<{ token: string }>('/auth/google/complete', {
         method: 'POST',
-        body: JSON.stringify({ pendingToken, username, firstName, lastName }),
+        body: JSON.stringify({ pendingToken, username, firstName, lastName, teamCode: teamCode || undefined }),
       })
       await handleOAuthCallback(token)
       navigate('/', { replace: true })
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      if (isApiError(err) && err.field === 'teamCode') {
+        setTeamCodeError(err.message)
+      } else {
+        setError(err instanceof Error ? err.message : 'Something went wrong')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -56,34 +65,13 @@ export function GoogleSetupPage() {
         </div>
 
         <form className="auth-page__form" onSubmit={handleSubmit} noValidate>
-          <div className="auth-page__field">
-            <label className="auth-page__label">
-              Username <span className="auth-page__required" aria-hidden="true">*</span>
-              <span className="auth-page__label-hint"> · seen by all riders</span>
-            </label>
-            <div className="auth-page__input-wrap">
-              <span className="auth-page__input-icon">
-                <BikeIcon />
-              </span>
-              <span
-                className={`auth-page__username-display${isFetching ? ' auth-page__username-display--loading' : ''}`}
-                aria-live="polite"
-                aria-label={isFetching ? 'Finding a username…' : `Suggested username: ${username}`}
-              >
-                {isFetching ? 'Finding your name…' : username}
-              </span>
-              <button
-                type="button"
-                className={`auth-page__username-refresh${isSpinning ? ' auth-page__username-refresh--spinning' : ''}`}
-                onClick={refresh}
-                disabled={isFetching}
-                aria-label="Get a new username suggestion"
-              >
-                <RefreshIcon />
-              </button>
-            </div>
-            {refreshError && <p className="auth-page__error">Couldn't get a new name — try again</p>}
-          </div>
+          <UsernameField
+            username={username}
+            isSpinning={isSpinning}
+            isFetching={isFetching}
+            refresh={refresh}
+            refreshError={refreshError}
+          />
 
           <div className="auth-page__field">
             <label className="auth-page__label" htmlFor="firstName">
@@ -118,6 +106,12 @@ export function GoogleSetupPage() {
               />
             </div>
           </div>
+
+          <TeamCodeField
+            value={teamCode}
+            onChange={(v) => { setTeamCode(v); setTeamCodeError('') }}
+            error={teamCodeError}
+          />
 
           {error && <p className="auth-page__error">{error}</p>}
 
