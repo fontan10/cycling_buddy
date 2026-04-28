@@ -225,6 +225,13 @@
   color: var(--text-muted);
 }
 
+.profile-page__input--code {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 /* ── Error ──────────────────────────────────── */
 .profile-page__error {
   font-family: var(--font-body);
@@ -282,4 +289,83 @@
 /* Avatar form — full-width save button */
 .profile-page__avatar-form .profile-page__save-btn {
   align-self: stretch;
+}
+
+/* Full-width save button variant */
+.profile-page__save-btn--full {
+  align-self: stretch;
+}
+
+/* Destructive tonal button — per design spec: soft tinted red, no solid fill */
+.profile-page__save-btn--danger {
+  background: rgba(224, 85, 85, 0.12);
+  color: #e05555;
+  box-shadow: none;
+}
+
+@media (hover: hover) {
+  .profile-page__save-btn--danger:hover:not(:disabled) {
+    background: rgba(224, 85, 85, 0.2);
+  }
+}
+
+/* ── Coach Badge ───────────────────────────── */
+.profile-page__coach-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: rgba(56, 182, 255, 0.12);
+  border-radius: var(--radius-pill);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.profile-page__coach-desc {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ── Team ──────────────────────────────────── */
+.profile-page__team-photo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.profile-page__team-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.profile-page__team-name {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.profile-page__team-code-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.profile-page__team-code {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+  background: rgba(56, 182, 255, 0.12);
+  border-radius: var(--radius-pill);
+  padding: var(--space-sm) var(--space-lg);
 }

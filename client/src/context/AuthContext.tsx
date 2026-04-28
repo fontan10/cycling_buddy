@@ -17,13 +17,14 @@ export interface User {
   googleId?: string
   firstName?: string
   lastName?: string
+  isCoach?: boolean
 }
 
 interface AuthState {
   user: User | null
   isLoading: boolean
   login: (login: string, password: string) => Promise<void>
-  register: (username: string, password: string, email?: string) => Promise<void>
+  register: (username: string, password: string, email?: string, teamCode?: string) => Promise<void>
   logout: () => void
   loginWithGoogle: () => void
   handleOAuthCallback: (token: string) => Promise<void>
@@ -76,10 +77,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const register = useCallback(
-    async (username: string, password: string, email?: string) => {
+    async (username: string, password: string, email?: string, teamCode?: string) => {
       const { token } = await apiFetch<{ token: string }>('/auth/register', {
         method: 'POST',
-        body: JSON.stringify({ username, password, email }),
+        body: JSON.stringify({ username, password, email, teamCode }),
       })
       await saveTokenAndFetch(token)
     },

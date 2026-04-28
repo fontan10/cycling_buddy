@@ -7,6 +7,8 @@ import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
 import { User } from '../models/User';
 import { UserProfile } from '../models/UserProfile';
+import { Team } from '../models/Team';
+import { TeamMembership } from '../models/TeamMembership';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
@@ -109,9 +111,9 @@ router.get('/suggest-usernames', async (req: Request, res: Response): Promise<vo
   res.json({ usernames: results });
 });
 
-// Register with username + password (email optional)
+// Register with username + password (email and teamCode optional)
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
-  const { username, email, password } = req.body;
+  const { username, email, password, teamCode } = req.body;
   if (!username || !password) {
     res.status(400).json({ error: 'Username and password are required' });
     return;
@@ -128,12 +130,32 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
       return;
     }
   }
+
+  let team = null;
+  if (teamCode?.trim()) {
+    team = await Team.findOne({ teamCode: teamCode.trim().toUpperCase() });
+    if (!team) {
+      res.status(422).json({ error: 'No team found with that code. Clear it to sign up without a team.', field: 'teamCode' });
+      return;
+    }
+  }
+
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await User.create({
     username: username.toLowerCase(),
     email:    email ? email.toLowerCase() : undefined,
     passwordHash,
   });
+
+  if (team) {
+    await TeamMembership.create({
+      userId:   user._id,
+      teamId:   team._id,
+      role:     'member',
+      joinedAt: new Date(),
+    });
+  }
+
   res.status(201).json({ token: signToken(String(user._id)) });
 });
 
@@ -173,7 +195,7 @@ router.get(
 
 // Complete Google sign-up: validate pending token + chosen username, then create user
 router.post('/google/complete', async (req: Request, res: Response): Promise<void> => {
-  const { pendingToken, username, firstName, lastName } = req.body;
+  const { pendingToken, username, firstName, lastName, teamCode } = req.body;
   if (!pendingToken || !username) {
     res.status(400).json({ error: 'Missing required fields' });
     return;
@@ -200,6 +222,15 @@ router.post('/google/complete', async (req: Request, res: Response): Promise<voi
     return;
   }
 
+  let team = null;
+  if (teamCode?.trim()) {
+    team = await Team.findOne({ teamCode: teamCode.trim().toUpperCase() });
+    if (!team) {
+      res.status(422).json({ error: 'No team found with that code. Clear it to sign up without a team.', field: 'teamCode' });
+      return;
+    }
+  }
+
   // Guard against race condition where account was created between redirects
   let user = await User.findOne({ googleId });
   if (!user && email) user = await User.findOne({ email });
@@ -210,6 +241,15 @@ router.post('/google/complete', async (req: Request, res: Response): Promise<voi
     if (firstName?.trim()) profileData.firstName = firstName.trim();
     if (lastName?.trim())  profileData.lastName  = lastName.trim();
     await UserProfile.create(profileData);
+  }
+
+  if (team) {
+    await TeamMembership.create({
+      userId:   user._id,
+      teamId:   team._id,
+      role:     'member',
+      joinedAt: new Date(),
+    });
   }
 
   res.status(201).json({ token: signToken(String(user._id)) });
