@@ -29,5 +29,6 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     throw err
   }
 
-  return res.json()
+  const text = await res.text()
+  return text ? JSON.parse(text) : (undefined as T)
 }

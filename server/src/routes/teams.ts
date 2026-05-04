@@ -185,6 +185,36 @@ router.post('/add-member', requireAuth, async (req: AuthRequest, res: Response):
   });
 });
 
+// Remove a non-coach member from the coach's team (coach only)
+router.delete('/members/:membershipId', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const coachMembership = await TeamMembership.findOne({ userId: req.userId, role: 'coach', leftAt: null });
+  if (!coachMembership) {
+    res.status(403).json({ error: 'Only coaches can remove members' });
+    return;
+  }
+
+  const target = await TeamMembership.findOne({ _id: req.params.membershipId, leftAt: null });
+  if (!target) {
+    res.status(404).json({ error: 'Membership not found' });
+    return;
+  }
+
+  if (String(target.teamId) !== String(coachMembership.teamId)) {
+    res.status(403).json({ error: 'Cannot remove a member from another team' });
+    return;
+  }
+
+  if (target.role === 'coach') {
+    res.status(400).json({ error: 'Cannot remove a coach from the team' });
+    return;
+  }
+
+  target.leftAt = new Date();
+  await target.save();
+
+  res.status(204).end();
+});
+
 // Create a new team (coach only, one active team per coach)
 router.post('/', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   const user = await User.findById(req.userId).lean<IUser>();

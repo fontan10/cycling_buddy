@@ -350,3 +350,67 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ── Remove Member ── */
+.team-page__remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-pill);
+  background: rgba(231, 76, 60, 0.1);
+  color: var(--color-danger);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  transition: background 150ms ease, color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) {
+  .team-page__remove-btn:hover {
+    background: rgba(231, 76, 60, 0.2);
+  }
+}
+
+.team-page__remove-btn:focus-visible {
+  outline: 2px solid var(--color-danger);
+  outline-offset: 2px;
+}
+
+.team-page__remove-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.team-page__remove-btn--confirm {
+  background: rgba(224, 85, 85, 0.12);
+  color: #e05555;
+}
+
+@media (hover: hover) {
+  .team-page__remove-btn--confirm:hover {
+    background: rgba(224, 85, 85, 0.22);
+  }
+}
+
+.team-page__remove-btn--cancel {
+  background: var(--surface-cell);
+  color: var(--text-muted);
+}
+
+@media (hover: hover) {
+  .team-page__remove-btn--cancel:hover {
+    background: var(--surface-card);
+  }
+}
+
+.team-page__remove-confirm {
+  display: flex;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
