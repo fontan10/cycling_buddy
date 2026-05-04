@@ -4,9 +4,10 @@ import { useAuth } from '../../context/AuthContext'
 import { isApiError } from '../../lib/api'
 import { BottomNav } from '../../components/BottomNav'
 import { useUsernameSuggestions } from '../../hooks/useUsernameSuggestions'
-import { BikeIcon, CloseIcon, GoogleIcon, LockIcon, MailIcon } from '../../components/Icons'
+import { BikeIcon, CloseIcon, GoogleIcon, MailIcon } from '../../components/Icons'
 import { UsernameField } from './UsernameField'
 import { TeamCodeField } from './TeamCodeField'
+import { PasswordField } from './PasswordField'
 import './AuthPage.css'
 
 type Tab = 'join' | 'login'
@@ -19,6 +20,7 @@ export function AuthPage() {
   const [teamCodeError, setTeamCodeError] = useState('')
   const [loginField, setLoginField] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -29,6 +31,10 @@ export function AuthPage() {
     e.preventDefault()
     setError('')
     setTeamCodeError('')
+    if (tab === 'join' && password !== confirmPassword) {
+      setError('Secret codes don\'t match — try again!')
+      return
+    }
     setIsLoading(true)
     try {
       if (tab === 'join') {
@@ -77,7 +83,7 @@ export function AuthPage() {
             role="tab"
             aria-selected={tab === 'join'}
             className={`auth-page__tab ${tab === 'join' ? 'auth-page__tab--active' : ''}`}
-            onClick={() => { setTab('join'); setError(''); setTeamCodeError('') }}
+            onClick={() => { setTab('join'); setError(''); setTeamCodeError(''); setPassword(''); setConfirmPassword('') }}
           >
             Join
           </button>
@@ -85,7 +91,7 @@ export function AuthPage() {
             role="tab"
             aria-selected={tab === 'login'}
             className={`auth-page__tab ${tab === 'login' ? 'auth-page__tab--active' : ''}`}
-            onClick={() => { setTab('login'); setError(''); setTeamCodeError('') }}
+            onClick={() => { setTab('login'); setError(''); setTeamCodeError(''); setPassword(''); setConfirmPassword('') }}
           >
             Login
           </button>
@@ -141,50 +147,55 @@ export function AuthPage() {
                 onChange={(v) => { setTeamCode(v); setTeamCodeError('') }}
                 error={teamCodeError}
               />
+
+              <PasswordField
+                id="password"
+                label="Secret Code"
+                value={password}
+                onChange={setPassword}
+                autoComplete="new-password"
+              />
+
+              <PasswordField
+                id="confirmPassword"
+                label="Confirm Secret Code"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+                autoComplete="new-password"
+              />
             </>
           ) : (
-            <div className="auth-page__field">
-              <label className="auth-page__label" htmlFor="loginField">
-                Username or Email
-              </label>
-              <div className="auth-page__input-wrap">
-                <span className="auth-page__input-icon">
-                  <MailIcon />
-                </span>
-                <input
-                  id="loginField"
-                  className="auth-page__input"
-                  type="text"
-                  placeholder="coolrider42 or you@example.com"
-                  value={loginField}
-                  onChange={(e) => setLoginField(e.target.value)}
-                  required
-                  autoComplete="username"
-                />
+            <>
+              <div className="auth-page__field">
+                <label className="auth-page__label" htmlFor="loginField">
+                  Username or Email
+                </label>
+                <div className="auth-page__input-wrap">
+                  <span className="auth-page__input-icon">
+                    <MailIcon />
+                  </span>
+                  <input
+                    id="loginField"
+                    className="auth-page__input"
+                    type="text"
+                    placeholder="coolrider42 or you@example.com"
+                    value={loginField}
+                    onChange={(e) => setLoginField(e.target.value)}
+                    required
+                    autoComplete="username"
+                  />
+                </div>
               </div>
-            </div>
-          )}
 
-          <div className="auth-page__field">
-            <label className="auth-page__label" htmlFor="password">
-              {tab === 'join' ? 'Secret Code' : 'Password'}
-            </label>
-            <div className="auth-page__input-wrap">
-              <span className="auth-page__input-icon">
-                <LockIcon />
-              </span>
-              <input
+              <PasswordField
                 id="password"
-                className="auth-page__input"
-                type="password"
-                placeholder="••••••••"
+                label="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete={tab === 'join' ? 'new-password' : 'current-password'}
+                onChange={setPassword}
+                autoComplete="current-password"
               />
-            </div>
-          </div>
+            </>
+          )}
 
           {error && <p className="auth-page__error">{error}</p>}
 
