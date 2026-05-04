@@ -13,6 +13,9 @@ export function TeamPage() {
   const [members, setMembers] = useState<TeamMember[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [confirmingDissolve, setConfirmingDissolve] = useState(false)
+  const [dissolving, setDissolving] = useState(false)
+  const [dissolveError, setDissolveError] = useState('')
 
   useEffect(() => {
     if (!user) { navigate('/auth', { replace: true }); return }
@@ -27,11 +30,20 @@ export function TeamPage() {
       .finally(() => setLoading(false))
   }, [user?._id])
 
-  const coaches = members.filter(m => m.role === 'coach')
-  const regularMembers = members.filter(m => m.role === 'member')
-
   function handleRemoveMember(id: string) {
     setMembers(prev => prev.filter(x => String(x._id) !== id))
+  }
+
+  async function handleDissolve() {
+    setDissolving(true)
+    setDissolveError('')
+    try {
+      await apiFetch('/teams/mine', { method: 'DELETE' })
+      navigate('/profile')
+    } catch (err) {
+      setDissolveError(err instanceof Error ? err.message : 'Failed to dissolve team.')
+      setDissolving(false)
+    }
   }
 
   return (
@@ -108,16 +120,7 @@ export function TeamPage() {
             <div className="team-page__card">
               <h2 className="team-page__section-title">Roster</h2>
               <ul className="team-page__member-list">
-                {coaches.map(m => (
-                  <MemberRow
-                    key={String(m._id)}
-                    member={m}
-                    isCoach={!!user?.isCoach}
-                    isSelf={String(m.user._id) === String(user?._id)}
-                    onRemove={handleRemoveMember}
-                  />
-                ))}
-                {regularMembers.map(m => (
+                {members.map(m => (
                   <MemberRow
                     key={String(m._id)}
                     member={m}
@@ -128,6 +131,45 @@ export function TeamPage() {
                 ))}
               </ul>
             </div>
+
+            {user?.isCoach && (
+              <div className="team-page__card team-page__danger-zone">
+                <h2 className="team-page__section-title">Danger Zone</h2>
+                {!confirmingDissolve && (
+                  <button
+                    className="team-page__remove-btn"
+                    type="button"
+                    onClick={() => setConfirmingDissolve(true)}
+                  >
+                    Dissolve Team
+                  </button>
+                )}
+                {confirmingDissolve && (
+                  <div className="team-page__dissolve-confirm">
+                    <p className="team-page__muted">This will permanently remove all members. This cannot be undone.</p>
+                    <span className="team-page__remove-confirm">
+                      <button
+                        className="team-page__remove-btn team-page__remove-btn--confirm"
+                        type="button"
+                        onClick={handleDissolve}
+                        disabled={dissolving}
+                      >
+                        {dissolving ? '…' : 'Confirm'}
+                      </button>
+                      <button
+                        className="team-page__remove-btn team-page__remove-btn--cancel"
+                        type="button"
+                        onClick={() => { setConfirmingDissolve(false); setDissolveError('') }}
+                        disabled={dissolving}
+                      >
+                        Cancel
+                      </button>
+                    </span>
+                    {dissolveError && <p className="team-page__error">{dissolveError}</p>}
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
 

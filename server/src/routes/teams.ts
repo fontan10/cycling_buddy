@@ -44,7 +44,7 @@ router.post('/join', requireAuth, async (req: AuthRequest, res: Response): Promi
     return;
   }
 
-  const team = await Team.findOne({ teamCode: teamCode.trim().toUpperCase() });
+  const team = await Team.findOne({ teamCode: teamCode.trim().toUpperCase(), dissolvedAt: null });
   if (!team) {
     res.status(404).json({ error: 'No team found with that code' });
     return;
@@ -71,6 +71,24 @@ router.post('/regenerate-code', requireAuth, async (req: AuthRequest, res: Respo
   const teamCode = await generateUniqueCode();
   const team = await Team.findByIdAndUpdate(membership.teamId, { teamCode }, { new: true });
   res.json({ team });
+});
+
+// Dissolve the team entirely — soft-deletes all memberships and the team itself (coach only)
+router.delete('/mine', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const coachMembership = await TeamMembership.findOne({ userId: req.userId, role: 'coach', leftAt: null });
+  if (!coachMembership) {
+    res.status(403).json({ error: 'Only coaches with an active team can dissolve it' });
+    return;
+  }
+
+  const now = new Date();
+  await TeamMembership.updateMany(
+    { teamId: coachMembership.teamId, leftAt: null },
+    { $set: { leftAt: now } },
+  );
+  await Team.findByIdAndUpdate(coachMembership.teamId, { dissolvedAt: now });
+
+  res.status(204).end();
 });
 
 // List all active members of the authenticated user's team

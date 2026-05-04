@@ -414,3 +414,14 @@
   gap: var(--space-sm);
   flex-shrink: 0;
 }
+
+/* ── Danger Zone ── */
+.team-page__danger-zone {
+  background: rgba(231, 76, 60, 0.08);
+}
+
+.team-page__dissolve-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
