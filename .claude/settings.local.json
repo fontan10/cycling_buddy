@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue *)",
+      "Bash(python -c \"import json,sys; issues=json.load\\(sys.stdin\\); [print\\(i['number'], i['title']\\) for i in issues]\")",
+      "Bash(python -c \"import json,sys; issues=json.load\\(sys.stdin\\); [print\\(i['number'], i['title']\\) for i in issues if i['number'] in [31,29,34,33]]\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\fonta\\\\repos\\\\cycling_buddy\" -Directory)",
+      "Bash(Select-Object Name)"
+    ]
+  }
+}
