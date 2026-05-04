@@ -260,3 +260,93 @@
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+
+.team-page__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Add Member ── */
+.team-page__add-form {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.team-page__search-input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-pill);
+  background: var(--surface-container-lowest);
+  border: 2px solid transparent;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.team-page__search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.team-page__search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(56, 182, 255, 0.15);
+}
+
+.team-page__search-input:disabled {
+  opacity: 0.6;
+}
+
+.team-page__search-result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--surface-cell);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.team-page__add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-pill);
+  background: var(--color-tertiary);
+  color: var(--text-on-primary);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  box-shadow: 0 3px 0 rgba(44, 62, 107, 0.2);
+  transition: transform 0.1s, box-shadow 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) {
+  .team-page__add-btn:hover {
+    background: #6AC948;
+  }
+}
+
+.team-page__add-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(44, 62, 107, 0.2);
+}
+
+.team-page__add-btn:focus-visible {
+  outline: 2px solid var(--color-tertiary);
+  outline-offset: 2px;
+}
+
+.team-page__add-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

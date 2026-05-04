@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import crypto from 'crypto';
 import { Team } from '../models/Team';
 import { TeamMembership } from '../models/TeamMembership';
-import { User } from '../models/User';
+import { User, type IUser } from '../models/User';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
@@ -99,10 +99,96 @@ router.get('/mine/members', requireAuth, async (req: AuthRequest, res: Response)
   res.json({ team: membership.teamId, members });
 });
 
+// Search for a user by exact username — coach only, returns availability status
+router.get('/search-user', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const coachMembership = await TeamMembership.findOne({ userId: req.userId, role: 'coach', leftAt: null });
+  if (!coachMembership) {
+    res.status(403).json({ error: 'Only coaches can search for users' });
+    return;
+  }
+
+  const { username } = req.query;
+  if (!username || typeof username !== 'string' || !username.trim()) {
+    res.status(400).json({ error: 'Username is required' });
+    return;
+  }
+
+  const target = await User.findOne({ username: username.trim().toLowerCase() }).lean<IUser>();
+  if (!target) {
+    res.json({ found: false });
+    return;
+  }
+
+  if (String(target._id) === req.userId) {
+    res.json({ found: true, available: false, reason: 'cannotAddSelf' });
+    return;
+  }
+
+  const existingMembership = await TeamMembership.findOne({ userId: target._id, leftAt: null });
+  if (existingMembership) {
+    res.json({ found: true, available: false, reason: 'alreadyOnTeam' });
+    return;
+  }
+
+  res.json({
+    found: true,
+    available: true,
+    user: { _id: target._id, username: target.username, avatarUrl: target.avatarUrl },
+  });
+});
+
+// Add a member to the coach's team by username (coach only)
+router.post('/add-member', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const coachMembership = await TeamMembership.findOne({ userId: req.userId, role: 'coach', leftAt: null });
+  if (!coachMembership) {
+    res.status(403).json({ error: 'Only coaches can add members' });
+    return;
+  }
+
+  const { username } = req.body;
+  if (!username?.trim()) {
+    res.status(400).json({ error: 'Username is required' });
+    return;
+  }
+
+  const target = await User.findOne({ username: username.trim().toLowerCase() }).lean<IUser>();
+  if (!target) {
+    res.status(404).json({ error: 'No user found with that username' });
+    return;
+  }
+
+  if (String(target._id) === req.userId) {
+    res.status(400).json({ error: 'You cannot add yourself to the team' });
+    return;
+  }
+
+  const existing = await TeamMembership.findOne({ userId: target._id, leftAt: null });
+  if (existing) {
+    res.status(409).json({ error: 'This user is already on a team' });
+    return;
+  }
+
+  const membership = await TeamMembership.create({
+    userId:   target._id,
+    teamId:   coachMembership.teamId,
+    role:     'member',
+    joinedAt: new Date(),
+  });
+
+  res.status(201).json({
+    member: {
+      _id:      membership._id,
+      role:     membership.role,
+      joinedAt: membership.joinedAt,
+      user: { _id: target._id, username: target.username, avatarUrl: target.avatarUrl },
+    },
+  });
+});
+
 // Create a new team (coach only, one active team per coach)
 router.post('/', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
-  const user = await User.findById(req.userId).lean();
-  if (!user || !(user as any).isCoach) {
+  const user = await User.findById(req.userId).lean<IUser>();
+  if (!user || !user.isCoach) {
     res.status(403).json({ error: 'Only coaches can create a team' });
     return;
   }
