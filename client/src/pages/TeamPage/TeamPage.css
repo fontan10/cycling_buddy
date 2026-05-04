@@ -134,6 +134,12 @@
 
 .team-page__member-row {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.team-page__member-main {
+  display: flex;
   align-items: center;
   gap: var(--space-md);
 }
@@ -349,6 +355,138 @@
 .team-page__add-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* ── More button ── */
+.team-page__more-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-circle);
+  background: var(--surface-cell);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-left: auto;
+  transition: background 150ms ease, color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) {
+  .team-page__more-btn:hover {
+    background: var(--surface-card);
+    color: var(--text-primary);
+  }
+}
+
+.team-page__more-btn--open {
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
+
+.team-page__more-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Member actions panel ── */
+.team-page__member-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-left: calc(40px + var(--space-md));
+}
+
+.team-page__action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: background 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.team-page__action-btn--promote {
+  background: rgba(56, 182, 255, 0.12);
+  color: var(--color-primary);
+}
+
+@media (hover: hover) {
+  .team-page__action-btn--promote:hover {
+    background: rgba(56, 182, 255, 0.22);
+  }
+}
+
+.team-page__action-btn--demote {
+  background: var(--surface-cell);
+  color: var(--text-muted);
+}
+
+@media (hover: hover) {
+  .team-page__action-btn--demote:hover {
+    background: var(--surface-card);
+  }
+}
+
+.team-page__action-btn--remove {
+  background: rgba(231, 76, 60, 0.1);
+  color: var(--color-danger);
+}
+
+@media (hover: hover) {
+  .team-page__action-btn--remove:hover {
+    background: rgba(231, 76, 60, 0.2);
+  }
+}
+
+.team-page__action-btn--remove-confirm {
+  background: rgba(224, 85, 85, 0.12);
+  color: #e05555;
+}
+
+@media (hover: hover) {
+  .team-page__action-btn--remove-confirm:hover {
+    background: rgba(224, 85, 85, 0.22);
+  }
+}
+
+.team-page__action-btn--cancel {
+  background: var(--surface-cell);
+  color: var(--text-muted);
+}
+
+@media (hover: hover) {
+  .team-page__action-btn--cancel:hover {
+    background: var(--surface-card);
+  }
+}
+
+.team-page__action-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.team-page__action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.team-page__confirm-row {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.team-page__confirm-row .team-page__action-btn {
+  flex: 1;
 }
 
 /* ── Remove Member ── */

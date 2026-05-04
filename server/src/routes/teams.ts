@@ -233,6 +233,42 @@ router.delete('/members/:membershipId', requireAuth, async (req: AuthRequest, re
   res.status(204).end();
 });
 
+// Promote or demote a team member's role (coach only; cannot change own role)
+router.patch('/members/:membershipId/role', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  const coachMembership = await TeamMembership.findOne({ userId: req.userId, role: 'coach', leftAt: null });
+  if (!coachMembership) {
+    res.status(403).json({ error: 'Only coaches can change member roles' });
+    return;
+  }
+
+  const { role } = req.body;
+  if (role !== 'coach' && role !== 'member') {
+    res.status(400).json({ error: 'Role must be "coach" or "member"' });
+    return;
+  }
+
+  const target = await TeamMembership.findOne({ _id: req.params.membershipId, leftAt: null });
+  if (!target) {
+    res.status(404).json({ error: 'Membership not found' });
+    return;
+  }
+
+  if (String(target.teamId) !== String(coachMembership.teamId)) {
+    res.status(403).json({ error: 'Cannot change the role of a member on another team' });
+    return;
+  }
+
+  if (String(target.userId) === req.userId) {
+    res.status(400).json({ error: 'You cannot change your own role' });
+    return;
+  }
+
+  target.role = role;
+  await target.save();
+
+  res.json({ role: target.role });
+});
+
 // Create a new team (coach only, one active team per coach)
 router.post('/', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   const user = await User.findById(req.userId).lean<IUser>();

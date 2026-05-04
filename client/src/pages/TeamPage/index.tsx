@@ -43,6 +43,17 @@ export function TeamPage() {
     setMembers(prev => prev.filter(x => String(x._id) !== id))
   }
 
+  function handleRoleChanged(membershipId: string, newRole: 'coach' | 'member') {
+    setMembers(prev => {
+      const updated = prev.map(m => String(m._id) === membershipId ? { ...m, role: newRole } : m)
+      return [...updated.filter(m => m.role === 'coach'), ...updated.filter(m => m.role !== 'coach')]
+    })
+  }
+
+  const isCurrentUserCoach = members.some(
+    m => String(m.user._id) === String(user?._id) && m.role === 'coach'
+  )
+
   return (
     <div className="team-page">
       <div className="team-page__inner">
@@ -75,7 +86,7 @@ export function TeamPage() {
           <div className="team-page__card team-page__empty">
             <p className="team-page__empty-title">You're not on a team yet</p>
             <p className="team-page__muted">
-              {user?.isCoach
+              {isCurrentUserCoach
                 ? 'Create a team from your profile to get started.'
                 : 'Ask your coach for a team code, then join from your profile.'}
             </p>
@@ -89,7 +100,7 @@ export function TeamPage() {
           <>
             <TeamHeader team={team} members={members} />
 
-            {user?.isCoach && (
+            {isCurrentUserCoach && (
               <AddMemberCard onAdded={handleMemberAdded} />
             )}
 
@@ -100,15 +111,16 @@ export function TeamPage() {
                   <MemberRow
                     key={String(m._id)}
                     member={m}
-                    isCoach={!!user?.isCoach}
+                    isCoach={!!isCurrentUserCoach}
                     isSelf={String(m.user._id) === String(user?._id)}
                     onRemove={handleMemberRemoved}
+                    onRoleChange={handleRoleChanged}
                   />
                 ))}
               </ul>
             </div>
 
-            {user?.isCoach && (
+            {isCurrentUserCoach && (
               <DangerZone onDissolved={() => navigate('/profile')} />
             )}
           </>
