@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../../lib/api'
+import { useAuth } from '../../context/AuthContext'
 import './LeaderboardPage.css'
 
 interface LeaderboardTeam {
@@ -7,6 +8,11 @@ interface LeaderboardTeam {
   name: string
   photoUrl: string
   totalPoints: number
+}
+
+interface MyRank {
+  rank: number
+  team: LeaderboardTeam
 }
 
 const RANK_COLORS = ['#E8A020', '#38B6FF', '#7ED957']
@@ -59,9 +65,11 @@ const SLOT_CONFIG = [
 ]
 
 export function LeaderboardPage() {
-  const [teams, setTeams]   = useState<LeaderboardTeam[]>([])
+  const { user } = useAuth()
+  const [teams, setTeams]     = useState<LeaderboardTeam[]>([])
+  const [myRank, setMyRank]   = useState<MyRank | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError]   = useState('')
+  const [error, setError]     = useState('')
 
   useEffect(() => {
     apiFetch<LeaderboardTeam[]>('/teams/leaderboard')
@@ -69,6 +77,13 @@ export function LeaderboardPage() {
       .catch(() => setError('Could not load leaderboard.'))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    if (!user) return
+    apiFetch<{ rank?: number; team: LeaderboardTeam | null }>('/teams/my-rank')
+      .then(data => { if (data.team && data.rank) setMyRank({ rank: data.rank, team: data.team }) })
+      .catch((err) => console.error('Failed to fetch team rank:', err))
+  }, [user])
 
   const top3 = teams.slice(0, 3)
   const rest  = teams.slice(3)
@@ -128,17 +143,37 @@ export function LeaderboardPage() {
 
           {rest.length > 0 && (
             <div className="lb-list">
-              {rest.map((team, i) => (
-                <div key={team._id} className="lb-list-row">
-                  <span className="lb-list-rank">{i + 4}</span>
-                  <TeamAvatar team={team} size={40} rank={i + 4} />
-                  <span className="lb-list-name">{team.name}</span>
-                  <span className="lb-list-pts">
-                    {team.totalPoints.toLocaleString()}
-                    <span className="lb-pts-label"> pts</span>
-                  </span>
-                </div>
-              ))}
+              {rest.map((team, i) => {
+                const isMyTeam = myRank?.team._id === team._id
+                return (
+                  <div key={team._id} className={`lb-list-row${isMyTeam ? ' lb-list-row--mine' : ''}`}>
+                    <span className="lb-list-rank">{i + 4}</span>
+                    <TeamAvatar team={team} size={40} rank={i + 4} />
+                    <span className="lb-list-name">{team.name}</span>
+                    {isMyTeam && <span className="lb-you-chip">YOU</span>}
+                    <span className="lb-list-pts">
+                      {team.totalPoints.toLocaleString()}
+                      <span className="lb-pts-label"> pts</span>
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {myRank && myRank.rank > 10 && (
+            <div className="lb-my-team-section">
+              <p className="lb-my-team-label">📍 Your Team</p>
+              <div className="lb-my-team-row">
+                <span className="lb-my-team-rank">#{myRank.rank}</span>
+                <TeamAvatar team={myRank.team} size={40} rank={myRank.rank} />
+                <span className="lb-list-name">{myRank.team.name}</span>
+                <span className="lb-you-chip">YOU</span>
+                <span className="lb-list-pts">
+                  {myRank.team.totalPoints.toLocaleString()}
+                  <span className="lb-pts-label"> pts</span>
+                </span>
+              </div>
             </div>
           )}
         </>

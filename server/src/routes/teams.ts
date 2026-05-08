@@ -121,11 +121,43 @@ router.get('/mine/members', requireAuth, async (req: AuthRequest, res: Response)
 router.get('/leaderboard', async (_req, res: Response): Promise<void> => {
   try {
     const teams = await Team.find({ dissolvedAt: null })
-      .sort({ totalPoints: -1 })
+      .sort({ totalPoints: -1, name: 1, createdAt: 1 })
       .limit(10)
       .select('name photoUrl totalPoints')
       .lean();
     res.json(teams);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+// Authenticated user's global rank — returns null if user has no active team
+router.get('/my-rank', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const membership = await TeamMembership.findOne({ userId: req.userId, leftAt: null })
+      .populate<{ teamId: { _id: string; name: string; photoUrl: string; totalPoints: number; createdAt: Date; dissolvedAt: Date | null } }>('teamId')
+      .lean();
+
+    if (!membership || !membership.teamId || membership.teamId.dissolvedAt) {
+      res.json({ team: null });
+      return;
+    }
+
+    const { teamId: team } = membership;
+
+    const rank = await Team.countDocuments({
+      dissolvedAt: null,
+      $or: [
+        { totalPoints: { $gt: team.totalPoints } },
+        { totalPoints: team.totalPoints, name: { $lt: team.name } },
+        { totalPoints: team.totalPoints, name: team.name, createdAt: { $lt: team.createdAt } },
+      ],
+    }) + 1;
+
+    res.json({
+      rank,
+      team: { _id: team._id, name: team.name, photoUrl: team.photoUrl, totalPoints: team.totalPoints },
+    });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }
