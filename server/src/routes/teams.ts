@@ -117,6 +117,20 @@ router.get('/mine/members', requireAuth, async (req: AuthRequest, res: Response)
   res.json({ team: membership.teamId, members });
 });
 
+// Top 10 teams by total points — accessible to all users
+router.get('/leaderboard', async (_req, res: Response): Promise<void> => {
+  try {
+    const teams = await Team.find({ dissolvedAt: null })
+      .sort({ totalPoints: -1 })
+      .limit(10)
+      .select('name photoUrl totalPoints')
+      .lean();
+    res.json(teams);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 // Search for a user by exact username — coach only, returns availability status
 router.get('/search-user', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   const coachMembership = await TeamMembership.findOne({ userId: req.userId, role: 'coach', leftAt: null });

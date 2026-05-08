@@ -5,9 +5,12 @@ import { HeroCard } from '../../components/HeroCard'
 import { CategoryCard } from '../../components/CategoryCard'
 import { BottomNav } from '../../components/BottomNav'
 import { MapPage } from '../MapPage'
+import { LeaderboardPage } from '../LeaderboardPage'
 import { CATEGORIES } from '../../data/categories'
 import type { Tab } from '../../types'
 import './LandingPage.css'
+
+// TODO: edit this page so the main page is its own Page component
 
 export function LandingPage() {
   const location = useLocation()
@@ -19,6 +22,16 @@ export function LandingPage() {
       <div className="page page--map">
         <Navbar />
         <MapPage />
+        <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
+    )
+  }
+
+  if (activeTab === 'rankings') {
+    return (
+      <div className="page">
+        <Navbar />
+        <LeaderboardPage />
         <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
     )

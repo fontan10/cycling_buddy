@@ -1,7 +1,11 @@
 import { Router, Response } from 'express';
 import { Report } from '../models/Report';
 import { ReportLike } from '../models/ReportLike';
+import { Team } from '../models/Team';
+import { TeamMembership } from '../models/TeamMembership';
 import { requireAuth, optionalAuth, AuthRequest } from '../middleware/auth';
+
+const REPORT_POINTS = 50;
 
 const router = Router();
 
@@ -67,6 +71,17 @@ router.post('/', optionalAuth, async (req: AuthRequest, res: Response) => {
       photoUrl,
       userId: req.userId ?? null,
     });
+
+    // TODO: points go to the user's *current* team, not the team they were in at
+    // submission time — if they switch teams, a later deletion will deduct from the
+    // wrong team.
+    if (req.userId) {
+      const membership = await TeamMembership.findOne({ userId: req.userId, leftAt: null }).lean();
+      if (membership) {
+        await Team.findByIdAndUpdate(membership.teamId, { $inc: { totalPoints: REPORT_POINTS } });
+      }
+    }
+
     res.status(201).json(report);
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
@@ -76,12 +91,24 @@ router.post('/', optionalAuth, async (req: AuthRequest, res: Response) => {
 // Soft delete a report
 router.delete('/:id', async (req, res) => {
   try {
+    // isDeleted: false ensures idempotency — a repeat call finds nothing and returns
+    // 404, preventing a double point deduction.
     const report = await Report.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false },
       { isDeleted: true, deletedAt: new Date() },
       { new: true },
     );
     if (!report) return res.status(404).json({ error: 'Report not found' });
+
+    // TODO: same team-ownership caveat as the create route — deducts from the
+    // reporter's *current* team, not necessarily the team that earned the points.
+    if (report.userId) {
+      const membership = await TeamMembership.findOne({ userId: report.userId, leftAt: null }).lean();
+      if (membership) {
+        await Team.findByIdAndUpdate(membership.teamId, { $inc: { totalPoints: -REPORT_POINTS } });
+      }
+    }
+
     res.json(report);
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });

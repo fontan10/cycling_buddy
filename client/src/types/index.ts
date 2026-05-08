@@ -17,7 +17,7 @@ export interface Category {
   color: string
 }
 
-export type Tab = 'map' | 'report' | 'badges'
+export type Tab = 'map' | 'report' | 'rankings'
 
 export interface Team {
   _id: string
