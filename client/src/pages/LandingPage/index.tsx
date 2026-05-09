@@ -1,70 +1,30 @@
 import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { Navbar } from '../../components/Navbar'
-import { HeroCard } from '../../components/HeroCard'
-import { CategoryCard } from '../../components/CategoryCard'
 import { BottomNav } from '../../components/BottomNav'
 import { MapPage } from '../MapPage'
 import { LeaderboardPage } from '../LeaderboardPage'
-import { CATEGORIES } from '../../data/categories'
+import { ReportPage } from '../ReportPage'
 import type { Tab } from '../../types'
 import './LandingPage.css'
 
-// TODO: edit this page so the main page is its own Page component
+const TAB_CONTENT: Record<Tab, React.ComponentType> = {
+  report: ReportPage,
+  map: MapPage,
+  rankings: LeaderboardPage,
+}
 
 export function LandingPage() {
   const location = useLocation()
   const [activeTab, setActiveTab] = useState<Tab>(location.state?.tab ?? 'report')
-  const navigate = useNavigate()
 
-  if (activeTab === 'map') {
-    return (
-      <div className="page page--map">
-        <Navbar />
-        <MapPage />
-        <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
-    )
-  }
-
-  if (activeTab === 'rankings') {
-    return (
-      <div className="page">
-        <Navbar />
-        <LeaderboardPage />
-        <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
-    )
-  }
+  const Content = TAB_CONTENT[activeTab]
 
   return (
-    <div className="page">
-
+    <div className={`page${activeTab === 'map' ? ' page--map' : ''}`}>
       <Navbar />
-
-      <main className="page__main">
-        <HeroCard
-          title="Something wrong?"
-          subtitle="Tell us what's happening and we'll help fix it!"
-        />
-
-        <section className="categories">
-          <h2 className="categories__label">What's the trouble?</h2>
-          <div className="categories__grid" role="list">
-            {CATEGORIES.map((cat) => (
-              <div key={cat.id} role="listitem">
-                <CategoryCard
-                  category={cat}
-                  onClick={(id) => navigate(`/report/${id}`)}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
-
+      <Content />
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-
     </div>
   )
 }
