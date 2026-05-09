@@ -58,9 +58,10 @@ router.get('/:id', async (req, res) => {
 // Create a report (anonymous or authenticated)
 router.post('/', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { categoryId, address, coords, description, photoUrl } = req.body;
+    const { categoryId, subcategoryId, address, coords, description, photoUrl } = req.body;
     const report = await Report.create({
       categoryId,
+      subcategoryId: subcategoryId ?? null,
       address,
       coords,
       location: {

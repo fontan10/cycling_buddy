@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import imageCompression from 'browser-image-compression'
 import { getCompressionOptions } from '../../lib/imageCompression'
 import { CATEGORIES } from '../../data/categories'
+import type { Subcategory } from '../../types'
 import { LocationPicker } from '../../components/LocationPicker'
 import { clearReportsCache } from '../MapPage'
 import { clearLeaderboardCache } from '../LeaderboardPage'
@@ -54,6 +55,40 @@ const CameraIcon = ({ size = 28 }: { size?: number }) => (
     <circle cx="12" cy="13" r="4" />
   </svg>
 )
+
+function SubcategoryField({ subcategories, selected, onChange, accentColor }: {
+  subcategories: Subcategory[]
+  selected: string | null
+  onChange: (id: string | null) => void
+  accentColor: string
+}) {
+  if (subcategories.length === 0) return null
+  return (
+    <div className="form-field">
+      <span className="form-field__label">
+        <span className="form-field__label-icon form-field__label-icon--yellow">🔍</span>
+        What's the specific problem?
+      </span>
+      <div className="subcategory-chips" role="group" aria-label="Subcategory">
+        {subcategories.map((sub) => {
+          const isSelected = selected === sub.id
+          return (
+            <button
+              key={sub.id}
+              type="button"
+              className={`subcategory-chip${isSelected ? ' subcategory-chip--selected' : ''}`}
+              style={isSelected ? { background: accentColor } : undefined}
+              aria-pressed={isSelected}
+              onClick={() => onChange(isSelected ? null : sub.id)}
+            >
+              {sub.label}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 function PhotoField({ preview, onChange, onClear }: {
   preview: string | null
@@ -108,6 +143,8 @@ export function ReportDetailsPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const category = CATEGORIES.find((c) => c.id === categoryId)
+  const [subcategoryId, setSubcategoryId] = useState<string | null>(null)
+  const subcategories = category?.subcategories ?? []
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null
@@ -150,6 +187,7 @@ export function ReportDetailsPage() {
         method: 'POST',
         body: JSON.stringify({
           categoryId,
+          ...(subcategoryId ? { subcategoryId } : {}),
           address: location.address,
           coords: location.coords,
           description,
@@ -176,6 +214,13 @@ export function ReportDetailsPage() {
 
       <main className="report-form-area">
         <form className="report-form" onSubmit={handleSubmit}>
+
+          <SubcategoryField
+            subcategories={subcategories}
+            selected={subcategoryId}
+            onChange={setSubcategoryId}
+            accentColor={category?.color ?? '#38B6FF'}
+          />
 
           <div className="form-field">
             <span className="form-field__label">

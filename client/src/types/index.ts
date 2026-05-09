@@ -1,6 +1,12 @@
+export interface Subcategory {
+  id: string
+  label: string
+}
+
 export interface Report {
   _id: string
   categoryId: string
+  subcategoryId?: string
   address: string
   coords: { lat: number; lng: number }
   description: string
@@ -15,6 +21,7 @@ export interface Category {
   emoji: string
   label: string
   color: string
+  subcategories?: Subcategory[]
 }
 
 export type Tab = 'map' | 'report' | 'rankings'

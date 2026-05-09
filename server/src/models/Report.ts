@@ -3,7 +3,8 @@ import { Schema, model, Types } from 'mongoose';
 const reportSchema = new Schema(
   {
     userId:       { type: Types.ObjectId, ref: 'User', default: null },
-    categoryId:   { type: String, required: true },
+    categoryId:    { type: String, required: true },
+    subcategoryId: { type: String, default: null },
     address:      { type: String, required: true },
     coords: {
       lat: { type: Number, required: true },
