@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
+import { StarIcon } from '../../components/Icons'
 import './LeaderboardPage.css'
 
 interface LeaderboardTeam {
@@ -157,12 +158,7 @@ export function LeaderboardPage() {
                   {team && (
                     <>
                       {rank === 1 && (
-                        <svg className="lb-star" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-                          <polygon
-                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                            fill="#E8A020"
-                          />
-                        </svg>
+                        <StarIcon className="lb-star" fill="#E8A020" />
                       )}
                       <div className="lb-podium-avatar-wrap">
                         <TeamAvatar team={team} size={rank === 1 ? 72 : 56} rank={rank} />

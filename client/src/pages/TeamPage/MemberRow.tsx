@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { apiFetch } from '../../lib/api'
 import type { TeamMember } from '../../types'
+import { MoreHorizontalIcon } from '../../components/Icons'
 
 export function MemberRow({ member, isCoach, isSelf, onRemove, onRoleChange }: {
   member: TeamMember
@@ -92,11 +93,7 @@ export function MemberRow({ member, isCoach, isSelf, onRemove, onRoleChange }: {
                 <line x1="11" y1="1" x2="1" y2="11" />
               </svg>
             ) : (
-              <svg width="16" height="4" viewBox="0 0 16 4" fill="currentColor" aria-hidden="true">
-                <circle cx="2" cy="2" r="1.5" />
-                <circle cx="8" cy="2" r="1.5" />
-                <circle cx="14" cy="2" r="1.5" />
-              </svg>
+              <MoreHorizontalIcon />
             )}
           </button>
         )}

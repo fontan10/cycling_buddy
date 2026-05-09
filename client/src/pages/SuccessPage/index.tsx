@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import { CATEGORIES } from '../../data/categories'
+import { BackArrowIcon, HomeIcon } from '../../components/Icons'
 import './SuccessPage.css'
 
 const SPARKLES = ['⭐', '🌟', '✨', '🎉', '💫', '🎊']
@@ -74,9 +75,7 @@ export function SuccessPage() {
           onClick={() => navigate('/', { state: { back: true } })}
           aria-label="Go back"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <BackArrowIcon />
         </button>
         <span className="success-header__title">Way to Go!</span>
         {/* <motion.div
@@ -191,10 +190,7 @@ export function SuccessPage() {
           whileTap={{ scale: 0.96 }}
           whileHover={{ scale: 1.03 }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
+          <HomeIcon />
           Let's go back home
         </motion.button>
       </motion.div>

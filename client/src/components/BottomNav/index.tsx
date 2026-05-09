@@ -1,4 +1,5 @@
 import type { Tab } from '../../types'
+import { PlusIcon } from '../Icons'
 import './BottomNav.css'
 
 interface BottomNavProps {
@@ -71,18 +72,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
       >
         <div className="bottom-nav__report-bubble">
           <div className="bottom-nav__report-icon">
-            <svg
-              width="22" height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            <PlusIcon />
           </div>
         </div>
         <span className="bottom-nav__label">Report</span>
