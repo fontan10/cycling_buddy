@@ -7,7 +7,7 @@ import { LocationPicker } from '../../components/LocationPicker'
 import { clearReportsCache } from '../MapPage'
 import { clearLeaderboardCache } from '../LeaderboardPage'
 import { apiFetch } from '../../lib/api'
-import './ReportPage.css'
+import './ReportDetailsPage.css'
 
 interface Coords { lat: number; lng: number }
 
@@ -95,7 +95,7 @@ function PhotoField({ preview, onChange, onClear }: {
   )
 }
 
-export function ReportPage() {
+export function ReportDetailsPage() {
   const { categoryId } = useParams()
   const navigate = useNavigate()
   const [location, setLocation] = useState<{ address: string; coords: Coords | null }>({
@@ -168,7 +168,7 @@ export function ReportPage() {
   }
 
   return (
-    <div className="report-page">
+    <div className="report-details-page">
 
       <ReportHeader onBack={() => navigate('/', { state: { back: true } })} />
       <ProgressDots />
