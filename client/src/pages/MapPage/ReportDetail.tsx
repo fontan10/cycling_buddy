@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { apiFetch } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
 import { ReportComments } from './ReportComments'
-import type { Category, Report } from '../../types'
+import type { Category, Report, Reporter } from '../../types'
 import './ReportDetail.css'
 
 interface Props {
@@ -21,6 +21,17 @@ export function ReportDetail({ report, category, onClose, onLikeChange, onCommen
   const [hasLiked, setHasLiked] = useState(false)
   const [liking, setLiking] = useState(false)
   const [commentCount, setCommentCount] = useState(report.commentCount)
+  const [reporter, setReporter] = useState<Reporter | null | undefined>(report.reporter)
+
+  const subcategoryLabel = report.subcategoryId
+    ? category.subcategories?.find(s => s.id === report.subcategoryId)?.label
+    : undefined
+
+  useEffect(() => {
+    apiFetch<Report>(`/reports/${report._id}`)
+      .then((data) => setReporter(data.reporter ?? null))
+      .catch(() => {})
+  }, [report._id])
 
   useEffect(() => {
     if (!user) return
@@ -74,6 +85,9 @@ export function ReportDetail({ report, category, onClose, onLikeChange, onCommen
           <p className="report-detail__category" style={{ color: category.color }}>
             {category.label}
           </p>
+          {subcategoryLabel && (
+            <span className="report-detail__subcategory">{subcategoryLabel}</span>
+          )}
           {report.address && (
             <p className="report-detail__address">
               {report.address.split(',').slice(0, 2).join(',')}
@@ -86,6 +100,20 @@ export function ReportDetail({ report, category, onClose, onLikeChange, onCommen
       <div className="report-detail__body">
         {report.photoUrl && (
           <img className="report-detail__photo" src={report.photoUrl} alt="Report" />
+        )}
+
+        {reporter && (
+          <div className="report-detail__reporter">
+            <div className="report-detail__reporter-avatar">
+              {reporter.avatarUrl
+                ? <img src={reporter.avatarUrl} alt="" />
+                : reporter.username[0].toUpperCase()}
+            </div>
+            <span className="report-detail__reporter-name">@{reporter.username}</span>
+            {reporter.isCoach && (
+              <span className="report-detail__coach-badge">Coach</span>
+            )}
+          </div>
         )}
 
         {report.description && (

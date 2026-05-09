@@ -47,9 +47,11 @@ router.get('/', async (req, res) => {
 // Get a single report
 router.get('/:id', async (req, res) => {
   try {
-    const report = await Report.findOne({ _id: req.params.id, isDeleted: false });
+    const report = await Report.findOne({ _id: req.params.id, isDeleted: false })
+      .populate('userId', 'username avatarUrl isCoach');
     if (!report) return res.status(404).json({ error: 'Report not found' });
-    res.json(report);
+    const { userId, ...rest } = report.toObject({ virtuals: false }) as any;
+    res.json({ ...rest, reporter: userId ?? null });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }

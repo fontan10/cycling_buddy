@@ -3,6 +3,13 @@ export interface Subcategory {
   label: string
 }
 
+export interface Reporter {
+  _id: string
+  username: string
+  avatarUrl?: string
+  isCoach: boolean
+}
+
 export interface Report {
   _id: string
   categoryId: string
@@ -14,6 +21,7 @@ export interface Report {
   createdAt: string
   likeCount: number
   commentCount: number
+  reporter?: Reporter | null
 }
 
 export interface Category {
