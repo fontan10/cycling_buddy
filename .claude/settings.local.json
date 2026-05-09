@@ -13,7 +13,16 @@
       "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
       "Bash(xargs ls -la)",
       "Bash(grep -E \"\\\\.\\(tsx?|jsx?\\)$\")",
-      "Bash(xargs grep -l \"type Report\")"
+      "Bash(xargs grep -l \"type Report\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\fonta\\\\repos\\\\cycling_buddy\\\\client\\\\src\" -Recurse -Depth 2)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Format-List)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\fonta\\\\repos\\\\cycling_buddy\\\\server\" -Force)",
+      "Bash(Select-Object -Property Mode, Name)",
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\fonta\\\\repos\\\\cycling_buddy\\\\server\\\\src\" | ForEach-Object { $_.Name; if \\($_.PSIsContainer\\) { Get-ChildItem -Path $_.FullName | ForEach-Object { \"  \" + $_.Name } } })",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\fonta\\\\repos\\\\cycling_buddy\\\\server\\\\api\" | ForEach-Object { $_.Name; if \\($_.PSIsContainer\\) { Get-ChildItem -Path $_.FullName | ForEach-Object { \"  \" + $_.Name } } })",
+      "Bash(Get-ChildItem -Recurse -Depth 2)"
     ]
   }
 }
