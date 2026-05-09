@@ -32,13 +32,20 @@ const FRESH = process.argv.includes('--fresh');
 // ---------------------------------------------------------------------------
 
 const TEAM_DEFS = [
-  { name: 'Tapiola Tamers',    teamCode: 'TAPM24' }, // 0
-  { name: 'Leppävaara Lynxes', teamCode: 'LEPL37' }, // 1
-  { name: 'Matinkylä Movers',  teamCode: 'MATK48' }, // 2
-  { name: 'Otaniemi Owls',     teamCode: 'NTAN59' }, // 3
-  { name: 'Espoo Centre Crew', teamCode: 'ESPC66' }, // 4
-  { name: 'Kallio Kickers',    teamCode: 'KALL73' }, // 5
-  { name: 'Töölö Trekkers',    teamCode: 'TTLK88' }, // 6
+  // 0 — peloton grinding uphill through rolling countryside
+  { name: 'Tapiola Tamers',    teamCode: 'TAPM24', photoUrl: 'https://images.unsplash.com/photo-1673890704132-9573476ac27c?fm=jpg&q=80&w=800&h=600&fit=crop&auto=format' },
+  // 1 — dramatic purple-lit group ride, fast and fierce
+  { name: 'Leppävaara Lynxes', teamCode: 'LEPL37', photoUrl: 'https://images.unsplash.com/photo-1735216228027-fe31c23474ce?fm=jpg&q=80&w=800&h=600&fit=crop&auto=format' },
+  // 2 — cheerful pack cruising a park path together
+  { name: 'Matinkylä Movers',  teamCode: 'MATK48', photoUrl: 'https://images.unsplash.com/photo-1776145674758-ef3124a25bbb?fm=jpg&q=80&w=800&h=600&fit=crop&auto=format' },
+  // 3 — tight road-cycling formation, very organised (fitting for Aalto folks)
+  { name: 'Otaniemi Owls',     teamCode: 'NTAN59', photoUrl: 'https://images.unsplash.com/photo-1605050825077-289f85b6cf43?fm=jpg&q=80&w=800&h=600&fit=crop&auto=format' },
+  // 4 — relaxed group ride on a sunny paved road
+  { name: 'Espoo Centre Crew', teamCode: 'ESPC66', photoUrl: 'https://images.unsplash.com/photo-1772439783106-dff24711a71b?fm=jpg&q=80&w=800&h=600&fit=crop&auto=format' },
+  // 5 — race-pace cyclists sprinting on a closed road
+  { name: 'Kallio Kickers',    teamCode: 'KALL73', photoUrl: 'https://images.unsplash.com/photo-1605050825221-66a810cb6d36?fm=jpg&q=80&w=800&h=600&fit=crop&auto=format' },
+  // 6 — moody black-and-white group out on an adventure
+  { name: 'Töölö Trekkers',    teamCode: 'TTLK88', photoUrl: 'https://images.unsplash.com/photo-1713937071114-e94d5f8053a0?fm=jpg&q=80&w=800&h=600&fit=crop&auto=format' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -522,21 +529,26 @@ const REPORT_DEFS: ReportDef[] = [
 // ---------------------------------------------------------------------------
 
 const COMMENT_TEXTS = [
-  'I saw this too, really dangerous!',
-  'Reported this last year and still nothing has been done.',
-  'Cycled past here this morning — still the same.',
-  'This happens every winter and they never fix it properly.',
-  'Same problem on the other side of the road too.',
-  'I nearly fell here last week!',
-  'Agree completely, something needs to be done.',
-  'This stretch is so bad I avoid it when I can.',
-  'Reported to the city, no response yet.',
-  'Our whole team avoids this route now.',
-  'I thought it was just me that found this scary!',
-  'This has been broken for months.',
-  'Please fix this, it\'s on the school route.',
-  'Saw a cyclist fall here last Tuesday.',
-  'Even walking past here feels sketchy.',
+  'scary!!',
+  'so dangerous omg',
+  'I cycled here with my dad and he said a bad word lol',
+  'this is literally on the way to my school and i have to go through it every single day and its SO bad. my mum says she will write a letter',
+  'fell here once. not fun.',
+  'me and my friends all go round the long way now because of this 😭',
+  'WHY HAS NOBODY FIXED THIS YET',
+  'i reported this with my mum and we got an email back but then nothing happened and that was like 3 months ago',
+  'nearly crashed here yesterday. there was a big puddle hiding the pothole and i went straight into it. my bike is fine but i was not fine',
+  'yes same!!!',
+  'my brother says it was like this last year too. just leave it forever i guess 🙄',
+  'the drain sticks up really high here and your wheel gets caught. happened to me twice',
+  'this is right outside the chip shop so its always busy and really hard to get past safely',
+  'agree',
+  'I told my teacher about this and she said to report it on here so here i am reporting it. please fix it thank you',
+  'cars park on the path here and you have to go into the road which is scary when its busy',
+  'its worse in the rain',
+  'my grandad says this street has always been bad and he used to cycle here when he was a kid too!! how has it not been fixed in that long!!',
+  'yes this one is bad',
+  '👎👎👎',
 ];
 
 // ---------------------------------------------------------------------------
@@ -566,7 +578,7 @@ async function seed() {
   // Teams
   console.log('Creating teams…');
   const teamDocs = await Team.insertMany(
-    TEAM_DEFS.map(t => ({ name: t.name, teamCode: t.teamCode, totalPoints: 0 })),
+    TEAM_DEFS.map(t => ({ name: t.name, teamCode: t.teamCode, photoUrl: t.photoUrl, totalPoints: 0 })),
   );
 
   // Users
