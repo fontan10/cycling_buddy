@@ -5,6 +5,7 @@ import { getCompressionOptions } from '../../lib/imageCompression'
 import { CATEGORIES } from '../../data/categories'
 import { LocationPicker } from '../../components/LocationPicker'
 import { clearReportsCache } from '../MapPage'
+import { clearLeaderboardCache } from '../LeaderboardPage'
 import { apiFetch } from '../../lib/api'
 import './ReportPage.css'
 
@@ -157,6 +158,7 @@ export function ReportPage() {
       })
 
       clearReportsCache()
+      clearLeaderboardCache()
       navigate('/success', { state: { categoryId } })
     } catch {
       setErrors({ submit: 'Something went wrong. Please try again.' })

@@ -15,6 +15,40 @@ interface MyRank {
   team: LeaderboardTeam
 }
 
+// Module-level cache so leaderboard data survives React unmount/remount without
+// a new network request. The data is intentionally app-lifetime scoped —
+// call clearLeaderboardCache() after any action that changes team rankings.
+let cachedTeams: LeaderboardTeam[] | null = null
+let teamsPromise: Promise<LeaderboardTeam[]> | null = null
+let cachedMyRank: MyRank | null | undefined = undefined // undefined = not yet fetched, null = no team
+
+// Incremented on every cache clear so that in-flight promises from a previous
+// fetch cycle can detect they are stale and skip writing to the cache.
+let cacheVersion = 0
+
+export function clearLeaderboardCache() {
+  cacheVersion++
+  cachedTeams = null
+  teamsPromise = null
+  cachedMyRank = undefined
+}
+
+function prefetchLeaderboard() {
+  if (teamsPromise) return teamsPromise
+  // Capture the version at the moment the request starts. If clearLeaderboardCache()
+  // is called before this promise resolves, the version will have advanced and we
+  // discard the now-stale response instead of repopulating the cleared cache.
+  const v = cacheVersion
+  teamsPromise = apiFetch<LeaderboardTeam[]>('/teams/leaderboard')
+    .then(data => { if (cacheVersion === v) cachedTeams = data; return data })
+    .catch(err => { teamsPromise = null; throw err })
+  return teamsPromise
+}
+
+// Start prefetch as soon as this module is imported so the data is likely
+// already in cache by the time the user navigates to the leaderboard.
+prefetchLeaderboard()
+
 const RANK_COLORS = ['#E8A020', '#38B6FF', '#7ED957']
 const RANK_BG     = ['rgba(232,160,32,0.15)', 'rgba(56,182,255,0.15)', 'rgba(126,217,87,0.15)']
 
@@ -66,22 +100,27 @@ const SLOT_CONFIG = [
 
 export function LeaderboardPage() {
   const { user } = useAuth()
-  const [teams, setTeams]     = useState<LeaderboardTeam[]>([])
-  const [myRank, setMyRank]   = useState<MyRank | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [teams, setTeams]     = useState<LeaderboardTeam[]>(cachedTeams ?? [])
+  const [myRank, setMyRank]   = useState<MyRank | null>(cachedMyRank ?? null)
+  const [loading, setLoading] = useState(cachedTeams === null)
   const [error, setError]     = useState('')
 
   useEffect(() => {
-    apiFetch<LeaderboardTeam[]>('/teams/leaderboard')
-      .then(setTeams)
-      .catch(() => setError('Could not load leaderboard.'))
-      .finally(() => setLoading(false))
+    if (cachedTeams !== null) return
+    prefetchLeaderboard()
+      .then(data => { setTeams(data); setLoading(false) })
+      .catch(() => { setError('Could not load leaderboard.'); setLoading(false) })
   }, [])
 
   useEffect(() => {
     if (!user) return
+    if (cachedMyRank !== undefined) { setMyRank(cachedMyRank); return }
     apiFetch<{ rank?: number; team: LeaderboardTeam | null }>('/teams/my-rank')
-      .then(data => { if (data.team && data.rank) setMyRank({ rank: data.rank, team: data.team }) })
+      .then(data => {
+        const rank = (data.team && data.rank) ? { rank: data.rank, team: data.team } : null
+        cachedMyRank = rank
+        setMyRank(rank)
+      })
       .catch((err) => console.error('Failed to fetch team rank:', err))
   }, [user])
 
