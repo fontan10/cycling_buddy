@@ -87,10 +87,6 @@ function PhotoField({ preview, onChange, onClear }: {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onClear: () => void
 }) {
-  const fileInput = (
-    <input id="photo" type="file" accept="image/*" className="photo-upload__input" onChange={onChange} />
-  )
-
   if (preview) {
     return (
       <div className="photo-preview">
@@ -101,24 +97,32 @@ function PhotoField({ preview, onChange, onClear }: {
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
-        <label htmlFor="photo" className="photo-preview__replace">
+        <label className="photo-preview__replace">
           <CameraIcon size={13} />
           Replace
-          {fileInput}
+          <input type="file" accept="image/*" className="photo-upload__input" onChange={onChange} />
         </label>
       </div>
     )
   }
 
   return (
-    <label className="photo-upload" htmlFor="photo">
+    <div className="photo-upload">
       <div className="photo-upload__icon-circle">
         <CameraIcon size={28} />
       </div>
       <span className="photo-upload__title">Add a Photo</span>
-      <span className="photo-upload__subtitle">Take a picture so we can see what happened!</span>
-      {fileInput}
-    </label>
+      <div className="photo-upload__options">
+        <label className="photo-upload__option photo-upload__option--camera">
+          Take Photo
+          <input type="file" accept="image/*" capture="environment" className="photo-upload__input" onChange={onChange} />
+        </label>
+        <label className="photo-upload__option photo-upload__option--gallery">
+          From Gallery
+          <input type="file" accept="image/*" className="photo-upload__input" onChange={onChange} />
+        </label>
+      </div>
+    </div>
   )
 }
 

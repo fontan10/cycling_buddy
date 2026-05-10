@@ -256,6 +256,64 @@
   display: none;
 }
 
+.photo-upload__options {
+  display: flex;
+  gap: var(--space-sm);
+  width: 100%;
+  margin-top: var(--space-xs);
+}
+
+.photo-upload__option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background 150ms ease, box-shadow 150ms ease, transform 120ms ease;
+}
+
+.photo-upload__option--camera {
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+  box-shadow: 0 4px 0 rgba(14, 48, 78, 0.20);
+}
+
+.photo-upload__option--gallery {
+  background: var(--surface-cell);
+  color: var(--color-primary);
+}
+
+.photo-upload__option--camera:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.photo-upload__option--gallery:active {
+  transform: translateY(2px);
+}
+
+@media (hover: hover) {
+  .photo-upload__option--camera:hover {
+    background: #1A9FEF;
+  }
+  .photo-upload__option--gallery:hover {
+    background: var(--surface-card);
+  }
+}
+
+.photo-upload__option:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* ── Photo preview ───────────────────────────────────────────── */
 .photo-preview {
   position: relative;
