@@ -9,10 +9,12 @@ interface Props {
   locating?: boolean
   /** Called with the resolved coords after a successful locate */
   onLocate?: (coords: [number, number]) => void
+  /** Minimum zoom level to use when centering on the user */
+  minZoom?: number
 }
 
 // TODO: make the location unavaiable error message appear nicer
-export function CenterOnUserButton({ locating = false, onLocate }: Props) {
+export function CenterOnUserButton({ locating = false, onLocate, minZoom = 18 }: Props) {
   const map = useMap()
   const [loading, setLoading] = useState(false)
   const [denied, setDenied] = useState(false)
@@ -31,7 +33,7 @@ export function CenterOnUserButton({ locating = false, onLocate }: Props) {
     setLoading(false)
     if (coords) {
       const latlng: [number, number] = [coords.lat, coords.lng]
-      const targetZoom = Math.max(map.getZoom(), 15)
+      const targetZoom = Math.max(map.getZoom(), minZoom)
       const alreadyCentered =
         map.getCenter().distanceTo(latlng) < 5 && map.getZoom() === targetZoom
       if (!alreadyCentered) map.flyTo(latlng, targetZoom, { duration: 1 })

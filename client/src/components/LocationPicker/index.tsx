@@ -60,6 +60,7 @@ function parseAddress(data: NominatimReverseData): DisplayAddress {
 
 export interface LocationPickerProps {
   onChange: (address: string, coords: Coords) => void
+  minZoom?: number
 }
 
 // ── Inner: drops a pin where the user taps ─────────────────────
@@ -69,16 +70,16 @@ function TapHandler({ onTap }: { onTap: (latlng: LatLng) => void }) {
 }
 
 // ── Inner: flies the map to new coordinates ────────────────────
-function FlyTo({ coords }: { coords: Coords | null }) {
+function FlyTo({ coords, zoom }: { coords: Coords | null; zoom: number }) {
   const map = useMap()
   useEffect(() => {
-    if (coords) map.flyTo([coords.lat, coords.lng], 16, { duration: 0.8 })
-  }, [coords, map])
+    if (coords) map.flyTo([coords.lat, coords.lng], zoom, { duration: 0.8 })
+  }, [coords, map, zoom])
   return null
 }
 
 // ── Main component ─────────────────────────────────────────────
-export function LocationPicker({ onChange }: LocationPickerProps) {
+export function LocationPicker({ onChange, minZoom = 18 }: LocationPickerProps) {
   const [pin, setPin] = useState<Coords | null>(null)
   const [flyTarget, setFlyTarget] = useState<Coords | null>(null)
   const [userGpsCoords, setUserGpsCoords] = useState<[number, number] | null>(null)
@@ -197,10 +198,10 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
         <TapHandler onTap={handleTap} />
-        <FlyTo coords={flyTarget} />
+        <FlyTo coords={flyTarget} zoom={minZoom} />
         {pin && <Marker position={[pin.lat, pin.lng]} icon={PIN_ICON} />}
         <UserLocationMarker coords={userGpsCoords} />
-        <CenterOnUserButton locating={locating} onLocate={(coords) => setUserGpsCoords(coords)} />
+        <CenterOnUserButton locating={locating} onLocate={(coords) => setUserGpsCoords(coords)} minZoom={minZoom} />
       </MapContainer>
 
       {/* Resolved address / hint */}

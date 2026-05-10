@@ -151,7 +151,7 @@ export function MapPage() {
         <MapController active={detailOpen} coords={selected?.coords ?? null} />
         <UserLocationFly coords={userLocation} />
         <UserLocationMarker coords={userLocation} />
-        <CenterOnUserButton locating={locating} onLocate={(coords) => setUserLocation(coords)} />
+        <CenterOnUserButton locating={locating} onLocate={(coords) => setUserLocation(coords)} minZoom={14} />
       </MapContainer>
 
       {loading && (
