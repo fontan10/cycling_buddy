@@ -5,16 +5,19 @@ import { getUserLocation } from '../../data/userLocation'
 import './CenterOnUserButton.css'
 
 interface Props {
+  /** Shows the spinner while the initial auto-location is resolving */
+  locating?: boolean
   /** Called with the resolved coords after a successful locate */
   onLocate?: (coords: [number, number]) => void
 }
 
 // TODO: make the location unavaiable error message appear nicer
-export function CenterOnUserButton({ onLocate }: Props) {
+export function CenterOnUserButton({ locating = false, onLocate }: Props) {
   const map = useMap()
   const [loading, setLoading] = useState(false)
   const [denied, setDenied] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
+  const busy = loading || locating
 
   useEffect(() => {
     if (wrapRef.current) L.DomEvent.disableClickPropagation(wrapRef.current)
@@ -42,12 +45,12 @@ export function CenterOnUserButton({ onLocate }: Props) {
   return (
     <div className="locate-btn-wrap" ref={wrapRef}>
       <button
-        className={`locate-btn${loading ? ' locate-btn--loading' : ''}`}
+        className={`locate-btn${busy ? ' locate-btn--loading' : ''}`}
         onClick={handleClick}
         aria-label="Center map on my location"
         type="button"
       >
-        {loading ? (
+        {busy ? (
           <span className="locate-btn__spinner" aria-hidden="true" />
         ) : (
           <svg

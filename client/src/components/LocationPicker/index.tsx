@@ -83,6 +83,7 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
   const [flyTarget, setFlyTarget] = useState<Coords | null>(null)
   const [userGpsCoords, setUserGpsCoords] = useState<[number, number] | null>(null)
   const [address, setAddress] = useState<DisplayAddress | null>(null)
+  const [locating, setLocating] = useState(true)
   const [resolving, setResolving] = useState(false)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<NominatimResult[]>([])
@@ -90,12 +91,17 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
 
   // Centre on device GPS when the map first loads
   useEffect(() => {
-    navigator.geolocation?.getCurrentPosition((pos) => {
-      const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-      setCachedUserLocation(coords)
-      setFlyTarget(coords)
-      setUserGpsCoords([pos.coords.latitude, pos.coords.longitude])
-    })
+    if (!navigator.geolocation) { setLocating(false); return }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+        setCachedUserLocation(coords)
+        setFlyTarget(coords)
+        setUserGpsCoords([pos.coords.latitude, pos.coords.longitude])
+        setLocating(false)
+      },
+      () => setLocating(false),
+    )
   }, [])
 
   const reverseGeocode = async (coords: Coords) => {
@@ -198,7 +204,7 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
         <FlyTo coords={flyTarget} />
         {pin && <Marker position={[pin.lat, pin.lng]} icon={PIN_ICON} />}
         <UserLocationMarker coords={userGpsCoords} />
-        <CenterOnUserButton onLocate={(coords) => setUserGpsCoords(coords)} />
+        <CenterOnUserButton locating={locating} onLocate={(coords) => setUserGpsCoords(coords)} />
       </MapContainer>
 
       {/* Resolved address / hint */}

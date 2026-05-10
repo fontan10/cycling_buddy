@@ -82,10 +82,12 @@ export function MapPage() {
   const [selected, setSelected] = useState<Report | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
+  const [locating, setLocating] = useState(true)
 
   useEffect(() => {
     getUserLocation().then((coords) => {
       if (coords) setUserLocation([coords.lat, coords.lng])
+      setLocating(false)
     })
   }, [])
 
@@ -149,7 +151,7 @@ export function MapPage() {
         <MapController active={detailOpen} coords={selected?.coords ?? null} />
         <UserLocationFly coords={userLocation} />
         <UserLocationMarker coords={userLocation} />
-        <CenterOnUserButton onLocate={(coords) => setUserLocation(coords)} />
+        <CenterOnUserButton locating={locating} onLocate={(coords) => setUserLocation(coords)} />
       </MapContainer>
 
       {loading && (
