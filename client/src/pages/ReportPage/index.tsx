@@ -9,10 +9,17 @@ export function ReportPage() {
 
   return (
     <main className="report-page">
-      <HeroCard
-        title="Something wrong?"
-        subtitle="Tell us what's happening and we'll help fix it!"
-      />
+      <div className="rp-hero-wrap">
+        <HeroCard
+          title="Something wrong?"
+          subtitle="Tell us what's happening and we'll help fix it!"
+        />
+        <div className="rp-deco" aria-hidden="true">
+          <span className="rp-deco--a">⭐</span>
+          <span className="rp-deco--b">✨</span>
+          <span className="rp-deco--c">💫</span>
+        </div>
+      </div>
 
       <section className="categories">
         <h2 className="categories__label">What's the trouble?</h2>

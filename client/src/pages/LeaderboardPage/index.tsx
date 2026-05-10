@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import { apiFetch } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
-import { StarIcon } from '../../components/Icons'
 import './LeaderboardPage.css'
 
 interface LeaderboardTeam {
@@ -52,31 +52,51 @@ prefetchLeaderboard()
 
 const RANK_COLORS = ['#E8A020', '#38B6FF', '#7ED957']
 const RANK_BG     = ['rgba(232,160,32,0.15)', 'rgba(56,182,255,0.15)', 'rgba(126,217,87,0.15)']
+const MEDALS      = ['🥇', '🥈', '🥉']
+
+function CountUp({ value }: { value: number }) {
+  const [display, setDisplay] = useState(0)
+  const rafRef = useRef<number>(0)
+  useEffect(() => {
+    const duration = 1000
+    const start = performance.now()
+    const step = (now: number) => {
+      const t = Math.min((now - start) / duration, 1)
+      const eased = 1 - Math.pow(1 - t, 3)
+      setDisplay(Math.round(eased * value))
+      if (t < 1) rafRef.current = requestAnimationFrame(step)
+    }
+    rafRef.current = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [value])
+  return <>{display.toLocaleString()}</>
+}
 
 function TeamAvatar({ team, size, rank }: { team: LeaderboardTeam; size: number; rank: number }) {
   const ringColor = rank <= 3 ? RANK_COLORS[rank - 1] : undefined
   const bgColor   = rank <= 3 ? RANK_BG[rank - 1]    : undefined
   const initial   = team.name.charAt(0).toUpperCase()
 
+  const glowClass = rank <= 3 ? ` lb-avatar--glow-${rank}` : ''
+
   if (team.photoUrl) {
     return (
       <img
-        className="lb-avatar lb-avatar--photo"
+        className={`lb-avatar lb-avatar--photo${glowClass}`}
         src={team.photoUrl}
         alt={team.name}
-        style={{ width: size, height: size, boxShadow: ringColor ? `0 0 0 3px ${ringColor}` : undefined }}
+        style={{ width: size, height: size }}
       />
     )
   }
   return (
     <div
-      className="lb-avatar lb-avatar--initial"
+      className={`lb-avatar lb-avatar--initial${glowClass}`}
       style={{
         width: size,
         height: size,
         fontSize: size * 0.38,
         backgroundColor: bgColor ?? 'var(--surface-cell)',
-        boxShadow: ringColor ? `0 0 0 3px ${ringColor}` : undefined,
         color: ringColor ?? 'var(--text-muted)',
       }}
     >
@@ -91,6 +111,32 @@ function RankBadge({ rank }: { rank: number }) {
       {rank}
     </div>
   )
+}
+
+const podiumContainerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
+}
+
+const podiumSlotVariants = {
+  hidden: { opacity: 0, y: 48, scale: 0.88 },
+  show: {
+    opacity: 1, y: 0, scale: 1,
+    transition: { type: 'spring' as const, stiffness: 180, damping: 18 },
+  },
+}
+
+const listContainerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+}
+
+const listRowVariants = {
+  hidden: { opacity: 0, x: -28 },
+  show: {
+    opacity: 1, x: 0,
+    transition: { type: 'spring' as const, stiffness: 300, damping: 26 },
+  },
 }
 
 const SLOT_CONFIG = [
@@ -131,10 +177,29 @@ export function LeaderboardPage() {
   return (
     <main className="lb-page">
 
-      <div className="lb-header">
-        <p className="lb-eyebrow">Global</p>
-        <h1 className="lb-title">Rankings</h1>
-      </div>
+      <motion.div
+        className="lb-header"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 22 }}
+      >
+        <motion.span
+          className="lb-header-trophy"
+          aria-hidden="true"
+          initial={{ rotate: -20, scale: 0.7 }}
+          animate={{ rotate: -10, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 160, damping: 12, delay: 0.25 }}
+        >🏆</motion.span>
+        <div className="lb-header-text">
+          <p className="lb-eyebrow">Global</p>
+          <h1 className="lb-title">Rankings</h1>
+        </div>
+        <div className="lb-header-decorations" aria-hidden="true">
+          <span className="lb-deco lb-deco--a">⭐</span>
+          <span className="lb-deco lb-deco--b">✨</span>
+          <span className="lb-deco lb-deco--c">⭐</span>
+        </div>
+      </motion.div>
 
       {loading && <p className="lb-muted">Loading…</p>}
 
@@ -150,50 +215,69 @@ export function LeaderboardPage() {
 
       {!loading && !error && teams.length > 0 && (
         <>
-          <div className="lb-podium">
+          <motion.div
+            className="lb-podium"
+            variants={podiumContainerVariants}
+            initial="hidden"
+            animate="show"
+          >
             {SLOT_CONFIG.map(({ rank, cls }) => {
               const team = top3[rank - 1]
               return (
-                <div key={team?._id ?? `empty-${rank}`} className={`lb-podium-slot ${cls}`}>
+                <motion.div
+                  key={team?._id ?? `empty-${rank}`}
+                  className={`lb-podium-slot ${cls}`}
+                  variants={podiumSlotVariants}
+                >
                   {team && (
                     <>
-                      {rank === 1 && (
-                        <StarIcon className="lb-star" fill="#E8A020" />
-                      )}
+                      <span className="lb-medal" role="img" aria-label={`${rank} place`}>
+                        {MEDALS[rank - 1]}
+                      </span>
                       <div className="lb-podium-avatar-wrap">
                         <TeamAvatar team={team} size={rank === 1 ? 72 : 56} rank={rank} />
                         <RankBadge rank={rank} />
                       </div>
                       <p className="lb-podium-name">{team.name}</p>
                       <p className="lb-podium-pts" style={{ color: RANK_COLORS[rank - 1] }}>
-                        {team.totalPoints.toLocaleString()}
+                        <CountUp value={team.totalPoints} />
                         <span className="lb-pts-label"> pts</span>
                       </p>
+                      <div className="lb-podium-platform" />
                     </>
                   )}
-                </div>
+                </motion.div>
               )
             })}
-          </div>
+          </motion.div>
 
           {rest.length > 0 && (
-            <div className="lb-list">
+            <motion.div
+              className="lb-list"
+              variants={listContainerVariants}
+              initial="hidden"
+              animate="show"
+            >
               {rest.map((team, i) => {
                 const isMyTeam = myRank?.team._id === team._id
                 return (
-                  <div key={team._id} className={`lb-list-row${isMyTeam ? ' lb-list-row--mine' : ''}`}>
+                  <motion.div
+                    key={team._id}
+                    className={`lb-list-row${isMyTeam ? ' lb-list-row--mine' : ''}`}
+                    variants={listRowVariants}
+                  >
                     <span className="lb-list-rank">{i + 4}</span>
                     <TeamAvatar team={team} size={40} rank={i + 4} />
                     <span className="lb-list-name">{team.name}</span>
                     {isMyTeam && <span className="lb-you-chip">YOU</span>}
                     <span className="lb-list-pts">
-                      {team.totalPoints.toLocaleString()}
+                      <CountUp value={team.totalPoints} />
                       <span className="lb-pts-label"> pts</span>
                     </span>
-                  </div>
+                  </motion.div>
                 )
               })}
-            </div>
+            </motion.div>
           )}
 
           {myRank && myRank.rank > 10 && (
@@ -205,7 +289,7 @@ export function LeaderboardPage() {
                 <span className="lb-list-name">{myRank.team.name}</span>
                 <span className="lb-you-chip">YOU</span>
                 <span className="lb-list-pts">
-                  {myRank.team.totalPoints.toLocaleString()}
+                  <CountUp value={myRank.team.totalPoints} />
                   <span className="lb-pts-label"> pts</span>
                 </span>
               </div>
