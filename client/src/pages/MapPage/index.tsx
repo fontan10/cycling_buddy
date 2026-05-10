@@ -62,6 +62,32 @@ function makeMarkerIcon(color: string, active = false) {
   })
 }
 
+function ClusterGroup({ children }: { children: React.ReactNode }) {
+  const map = useMap()
+  return (
+    <MarkerClusterGroup
+      iconCreateFunction={(cluster: { getChildCount: () => number }) =>
+        L.divIcon({
+          className: '',
+          html: `<div class="cluster-marker">${cluster.getChildCount()}</div>`,
+          iconSize: [44, 44],
+          iconAnchor: [22, 22],
+        })
+      }
+      showCoverageOnHover={false}
+      maxClusterRadius={60}
+      zoomToBoundsOnClick={false}
+      eventHandlers={{
+        clusterclick: (e: L.LeafletEvent & { layer: L.Layer & { getBounds: () => L.LatLngBounds } }) => {
+          map.flyToBounds(e.layer.getBounds(), { padding: [40, 40], duration: 0.5, easeLinearity: 0.5 })
+        },
+      }}
+    >
+      {children}
+    </MarkerClusterGroup>
+  )
+}
+
 function UserLocationFly({ coords }: { coords: [number, number] | null }) {
   const map = useMap()
   const flown = useRef(false)
@@ -119,18 +145,7 @@ export function MapPage() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
 
-        <MarkerClusterGroup
-          iconCreateFunction={(cluster: { getChildCount: () => number }) =>
-            L.divIcon({
-              className: '',
-              html: `<div class="cluster-marker">${cluster.getChildCount()}</div>`,
-              iconSize: [44, 44],
-              iconAnchor: [22, 22],
-            })
-          }
-          showCoverageOnHover={false}
-          maxClusterRadius={60}
-        >
+        <ClusterGroup>
           {reports.map((report) => {
             const cat = CATEGORIES.find((c) => c.id === report.categoryId)
             if (!cat || !report.coords) return null
@@ -146,7 +161,7 @@ export function MapPage() {
               />
             )
           })}
-        </MarkerClusterGroup>
+        </ClusterGroup>
 
         <MapController active={detailOpen} coords={selected?.coords ?? null} />
         <UserLocationFly coords={userLocation} />
