@@ -4,7 +4,7 @@ import L from 'leaflet'
 import type { LatLng } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { DEFAULT_CENTER } from '../../data/map'
-import { setCachedUserLocation } from '../../data/userLocation'
+import { getUserLocation } from '../../data/userLocation'
 import { UserLocationMarker } from '../UserLocationMarker'
 import { CenterOnUserButton } from '../CenterOnUserButton'
 import './LocationPicker.css'
@@ -91,17 +91,13 @@ export function LocationPicker({ onChange }: LocationPickerProps) {
 
   // Centre on device GPS when the map first loads
   useEffect(() => {
-    if (!navigator.geolocation) { setLocating(false); return }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-        setCachedUserLocation(coords)
+    getUserLocation().then((coords) => {
+      if (coords) {
         setFlyTarget(coords)
-        setUserGpsCoords([pos.coords.latitude, pos.coords.longitude])
-        setLocating(false)
-      },
-      () => setLocating(false),
-    )
+        setUserGpsCoords([coords.lat, coords.lng])
+      }
+      setLocating(false)
+    })
   }, [])
 
   const reverseGeocode = async (coords: Coords) => {

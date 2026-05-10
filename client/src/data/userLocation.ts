@@ -2,10 +2,6 @@ interface Coords { lat: number; lng: number }
 
 let cached: Coords | null = null
 
-export function setCachedUserLocation(coords: Coords) {
-  cached = coords
-}
-
 export function getUserLocation(): Promise<Coords | null> {
   if (cached) return Promise.resolve(cached)
   return new Promise((resolve) => {
